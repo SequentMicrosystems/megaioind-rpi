@@ -16,7 +16,9 @@ Before compiling you have to install [Wiring Pi](http://wiringpi.com/download-an
 ```
 
 Now you can access all the functions of the MegaIO Industrial board through the command "megaioind".
+
 Type megaioind -h for command options list.
+
 If you clone the repository any update can be made with the following commands:
 
 ```bash
