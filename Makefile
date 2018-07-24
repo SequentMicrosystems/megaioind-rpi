@@ -34,6 +34,8 @@ clean:
 install: megaioind
 	$Q echo "[Install]"
 	$Q cp megaioind		$(DESTDIR)$(PREFIX)/bin
+	$Q rm -f $(OBJ) megaioind *~ core tags *.bak
+   
 ifneq ($(WIRINGPI_SUID),0)
 	$Q chown root.root	$(DESTDIR)$(PREFIX)/bin/megaioind
 	$Q chmod 4755		$(DESTDIR)$(PREFIX)/bin/megaioind
