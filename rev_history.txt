@@ -1,0 +1,7 @@
+Version 1.0.0:
+   Initial release.
+   Basic access to 4-20mA input and output (read/ write no interrupts)
+   Basic access t0 0-10V input and output (read/ write no interrupts)
+   Basic acces to optocuppled inputs, relays and open drain outputs
+   
+   
