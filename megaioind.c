@@ -21,7 +21,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)0
-#define VERSION_MINOR	(int)0
+#define VERSION_MINOR	(int)1
 
 int gHwAdd = MEGAIO_HW_I2C_BASE_ADD;
 
@@ -684,11 +684,11 @@ static void doOcOutRead(int argc, char *argv[])
     "         megaioind <id> ruin <channel>\n"
     "         megaioind <id> ruout <channel>\n"
     "         megaioind <id> wuout <channel> <value>\n"
-    "         megaioind <id> optread <channel>\n"
-    "         megaioind <id> optread\n"
-		"         megaioind <id> ocread\n"
-		"         megaioind <id> ocwrite <ch> <on/off; 1/0>\n"
-		"         megaioind <id> ocwrite <val>\n"
+    "         megaioind <id> ropto <channel>\n"
+    "         megaioind <id> ropto\n"
+		"         megaioind <id> roc\n"
+		"         megaioind <id> woc <ch> <on/off; 1/0>\n"
+		"         megaioind <id> woc <val>\n"
 		"Where: <id> = Board level id = 0..3\n"
 		"Type megaioind -h <command> for more help";// No trailing newline needed here.
    
@@ -751,20 +751,20 @@ void doHelp(int argc, char *argv[])
 			printf("\tUsage:       megaioind <id> wuout <value>\n");
 			printf("\tExample:     megaioind 0 wuout 1 5.33; Set 5.33V on output channel 1\n"); 
 		}
-		else if (strcasecmp (argv [2], "optread"   ) == 0)	
+		else if (strcasecmp (argv [2], "ropto"   ) == 0)	
 		{ 
 			printf("\toptread:     Read Optically Isolated Input bit or port\n");
 			printf("\tUsage:       megaioind <id> optread (<channel>)\n");
 			printf("\tExample:     megaio 0 optread; Read all optically isolated inputs\n"); 
 			printf("\tExample:     megaio 0 optread 3; Read optically isolated input #3\n"); 
 		}		
-		else if(strcasecmp(argv[2], "ocread") == 0)
+		else if(strcasecmp(argv[2], "roc") == 0)
 		{
 			printf("\tocread:   Read the open-collector output's\n");
 			printf("\tUsage:    megaioind <id> ocread\n");
 			printf("\tExample:  megaio 0 ocread\n");
 		}
-		else if(strcasecmp(argv[2], "ocwrite") == 0)
+		else if(strcasecmp(argv[2], "woc") == 0)
 		{
 			printf("\tocwrite:  Write the open-collectot output's\n");
 			printf("\tUsage:    megaioind <id> ocwrite <val>\n");
@@ -884,6 +884,7 @@ int main(int argc, char *argv [])
   else if (strcasecmp (argv [2], "board"   ) == 0)	{ doBoard          (argc) 		;	return 0 ; } 
   else if (strcasecmp (argv [2], "woc"     ) == 0)	{ doOcOutWrite     (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "roc"     ) == 0)	{ doOcOutRead      (argc, argv) ;	return 0 ; }
- 
+  else 
+    printf("Invalid argument \n");
   return 0;
 }
