@@ -29,7 +29,7 @@ int gHwAdd = MEGAIO_HW_I2C_BASE_ADD;
 
 
 			  
-char *warranty ="	       Copyright (c) 2016-2018 Sequent Microsystems\n"
+char *warranty ="	       Copyright (c) 2016-2019 Sequent Microsystems\n"
 				"                                                             \n"
 				"		This program is free software; you can redistribute it and/or modify\n"
 				"		it under the terms of the GNU Leser General Public License as published\n"
@@ -47,7 +47,7 @@ char *warranty ="	       Copyright (c) 2016-2018 Sequent Microsystems\n"
 
 
 				
-char *failStr = "    ########    ###    #### ##       #### \n"
+char *failStr = 	"    ########    ###    #### ##       #### \n"
           			"    ##         ## ##    ##  ##       #### \n"
           			"    ##        ##   ##   ##  ##       #### \n"
           			"    ######   ##     ##  ##  ##        ##  \n"
@@ -95,7 +95,7 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 		return ERROR;
 		break;
 	}
-	if(0 < resp)
+	if(0 <= resp)
 	{
 		return OK;
 	}
@@ -114,8 +114,8 @@ static void doRelayWrite(int argc, char *argv[])
 
 	if ((argc != 5) && (argc != 4))
 	{
-		printf( "Usage: megaioind <id> rwrite <relay number> <on/off> \n") ;
-		printf( "Usage: megaioind <id> rwrite <relay reg value> \n") ;
+		printf( "Usage: megaioind <id> wrelay <relay number> <on/off> \n") ;
+		printf( "Usage: megaioind <id> wrelay <relay reg value> \n") ;
 		exit (1) ;
 	}
 
@@ -498,7 +498,7 @@ static void doOptoInRead(int argc, char *argv[])
 			exit(1);
 		}
 
-		val = readReg8(dev, OPTO_IN_MEM_ADD);
+		val = readReg8(dev, OPTO_VAL_ADD);
 		val = val & (1 << (pin-1));
 		if(val != 0)
 		{
@@ -511,7 +511,7 @@ static void doOptoInRead(int argc, char *argv[])
 	}
 	else if(argc == 3)
 	{
-		val = readReg8(dev, OPTO_IN_MEM_ADD);
+		val = readReg8(dev, OPTO_VAL_ADD);
 		printf("%d\n", val);
 	}
 	else
@@ -563,13 +563,13 @@ static void doOcOutWrite(int argc, char *argv[])
 		}
 		if (val == 0)
 		{
-			writeReg8 (dev,OC_OUT_CLR_MEM_ADD, pin);
+			writeReg8 (dev,OC_CLR_ADD, pin);
 		}
 		else
 		{
-			writeReg8 (dev,OC_OUT_SET_MEM_ADD, pin);
+			writeReg8 (dev,OC_SET_ADD, pin);
 		}
-		valR = readReg8(dev, OC_OUT_VAL_MEM_ADD);
+		valR = readReg8(dev, OC_VAL_ADD);
 		valRmask = 0x01 & (valR >> (pin - 1));
 		retry = RETRY_TIMES;
 	
@@ -577,13 +577,13 @@ static void doOcOutWrite(int argc, char *argv[])
 		{
 			if (val == 0)
 			{
-				writeReg8 (dev,OC_OUT_CLR_MEM_ADD, pin);
+				writeReg8 (dev,OC_CLR_ADD, pin);
 			}
 			else
 			{
-				writeReg8 (dev,OC_OUT_SET_MEM_ADD, pin);
+				writeReg8 (dev,OC_SET_ADD, pin);
 			}
-			valR = readReg8(dev, OC_OUT_VAL_MEM_ADD);
+			valR = readReg8(dev, OC_VAL_ADD);
 			valRmask = 0x01 & (valR >> (pin - 1));
 			retry--;
 		}
@@ -610,9 +610,9 @@ static void doOcOutWrite(int argc, char *argv[])
 		retry = RETRY_TIMES;
 		while((retry > 0) && (valR != val))
 		{
-			writeReg8 (dev,OC_OUT_VAL_MEM_ADD, val);
+			writeReg8 (dev,OC_VAL_ADD, val);
 		
-			valR = readReg8(dev, OC_OUT_VAL_MEM_ADD);
+			valR = readReg8(dev, OC_VAL_ADD);
 		}
 		if(retry == 0)
 		{
@@ -647,7 +647,7 @@ static void doOcOutRead(int argc, char *argv[])
       exit(1);
     }
 
-    val = readReg8(dev, OC_OUT_VAL_MEM_ADD);
+    val = readReg8(dev, OC_VAL_ADD);
     val = val & (1 << (pin-1));
     if(val != 0)
     {
@@ -660,7 +660,7 @@ static void doOcOutRead(int argc, char *argv[])
   }
   else if(argc == 3)
   {
-    val = readReg8(dev, OC_OUT_VAL_MEM_ADD);
+    val = readReg8(dev, OC_VAL_ADD);
     printf("%d\n", val);
   }
   else
@@ -787,6 +787,8 @@ void doHelp(int argc, char *argv[])
 void doBoard(int argc)
 {
 	int dev, hwMajor, hwMinor, minor , major;
+	int bType = 0;
+	
 	
 	if(argc == 3)
 	{
@@ -799,7 +801,19 @@ void doBoard(int argc)
 		hwMinor = readReg8(dev, REVISION_HW_MINOR_MEM_ADD);
 		major = readReg8(dev, REVISION_MAJOR_MEM_ADD);
 		minor = readReg8(dev, REVISION_MINOR_MEM_ADD);
-		printf("MegaIO Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
+		bType = readReg8(dev, BOARD_TYPE_MEM_ADD);
+		switch (bType)
+		{
+		case BOARD_TYPE_IND:
+			printf("MegaIO Industrial Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
+			break;
+		case BOARD_TYPE_BAS:
+			printf("MegaIO Building Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
+			break;
+		default:
+			printf("Invalid board Type\n");
+			break;
+		}
 	}
 	else
 	{
