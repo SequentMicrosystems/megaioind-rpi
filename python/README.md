@@ -44,7 +44,7 @@ ch - selected channel number [1..4]
 return - value in mA [0..20]
 
 
-###set_iout_ma(stack, ch, value)
+### set_iout_ma(stack, ch, value)
 Set the selected output 4-20mA channel value in mA
 
 stack - stack level of the megaIO Industrial card (selectable from address jumpers [0..3])

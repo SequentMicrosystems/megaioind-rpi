@@ -4,4 +4,7 @@ Version 1.0.0:
    Basic access t0 0-10V input and output (read/ write no interrupts)
    Basic acces to optocuppled inputs, relays and open drain outputs
    
+Version 1.0.1:
+   Solve usage string
+   Solve -h command 
    
