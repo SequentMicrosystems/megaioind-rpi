@@ -20,8 +20,8 @@
 #include "megaioind.h"
 
 #define VERSION_BASE	(int)1
-#define VERSION_MAJOR	(int)0
-#define VERSION_MINOR	(int)1
+#define VERSION_MAJOR	(int)1
+#define VERSION_MINOR	(int)0
 
 int gHwAdd = MEGAIO_HW_I2C_BASE_ADD;
 
@@ -62,6 +62,66 @@ char *passStr = "    ########     ###     ######   ######  \n"
         				"    ##        #########       ##       ## \n"
         				"    ##        ##     ## ##    ## ##    ## \n"
         				"    ##        ##     ##  ######   ######  \n";
+						
+char *indConnStr = 	"------------------------------------------------------------\n"
+					"|o| +24                                       0-10V OUT4 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
+					"|o| 0-10V IN3                                       GND  |o|\n"
+					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"------------------------------------------------------------\n"
+					"|o| 4-20mA IN4-                                      GND |o|\n"
+					"|o| 4-20mA IN4+                              4-20mA OUT4 |o|\n"
+					"|o| 4-20mA IN3-                                      GND |o|\n"
+					"|o| 4-20mA IN3+                              4-20mA OUT3 |o|\n"
+					"|o| 4-20mA IN2-                                      GND |o|\n"
+					"|o| 4-20mA IN2+                              4-20mA OUT2 |o|\n"
+					"|o| 4-20mA IN1-                                      GND |o|\n"
+					"|o| 4-20mA IN1+                              4-20mA OUT1 |o|\n"
+					"------------------------------------------------------------\n"
+					"------------------------------------------------------------\n"
+					"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
+					"|o| OPTO IN4+                                        GND |o|\n"
+					"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
+					"|o| OPTO IN3+                                        GND |o|\n"
+					"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
+					"|o| OPTO IN2+                                        GND |o|\n"
+					"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
+					"|o| OPTO IN1+                                        GND |o|\n"
+					"------------------------------------------------------------\n";	
+
+char *basConnStr = 	"------------------------------------------------------------\n"
+					"|o| +24                                       0-10V OUT4 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
+					"|o| 0-10V IN3                                       GND  |o|\n"
+					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
+					"|o| GND                                             GND  |o|\n"
+					"------------------------------------------------------------\n"
+					"|o| 10K TH IN4-                                      GND |o|\n"
+					"|o| 10K TH IN4+                               0-10V OUT8 |o|\n"
+					"|o| 10K TH IN3-                                      GND |o|\n"
+					"|o| 10K TH IN3+                               0-10V OUT7 |o|\n"
+					"|o| 10K TH IN2-                                      GND |o|\n"
+					"|o| 10K TH IN2+                               0-10V OUT6 |o|\n"
+					"|o| 10K TH IN1-                                      GND |o|\n"
+					"|o| 10K TH IN1+                               0-10V OUT5 |o|\n"
+					"------------------------------------------------------------\n"
+					"------------------------------------------------------------\n"
+					"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
+					"|o| OPTO IN4+                                        GND |o|\n"
+					"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
+					"|o| OPTO IN3+                                        GND |o|\n"
+					"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
+					"|o| OPTO IN2+                                        GND |o|\n"
+					"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
+					"|o| OPTO IN1+                                        GND |o|\n"
+					"------------------------------------------------------------\n";					
 		  
 void printbits(int v) 
 {
@@ -110,7 +170,7 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 */
 static void doRelayWrite(int argc, char *argv[])
 {
-	int pin, val, dev, valR, valRmask, retry;
+	int pin, val, dev, valR, valRmask, retry, bType;
 
 	if ((argc != 5) && (argc != 4))
 	{
@@ -119,7 +179,7 @@ static void doRelayWrite(int argc, char *argv[])
 		exit (1) ;
 	}
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
@@ -198,9 +258,9 @@ static void doRelayWrite(int argc, char *argv[])
 */
 static void doRelayRead(int argc, char *argv[])
 {
-	int pin, val, dev;
+	int pin, val, dev, bType;
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
@@ -256,12 +316,17 @@ static void doRelayRead(int argc, char *argv[])
 */
 static void do420InRead(int argc, char *argv[])
 {
-	int pin, dev, rd;
+	int pin, dev, rd, bType;
  float val;
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
+		exit(1);
+	}
+	if(bType != BOARD_TYPE_IND)
+	{
+		printf("Valid for Industrial board type only!");
 		exit(1);
 	}
 	if (argc == 4)
@@ -290,12 +355,17 @@ static void do420InRead(int argc, char *argv[])
 */
 static void do420OutRead(int argc, char *argv[])
 {
-	int pin, dev, rd;
- float val;
+	int pin, dev, rd, bType;
+	float val;
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
+		exit(1);
+	}
+	if(bType != BOARD_TYPE_IND)
+	{
+		printf("Valid for Industrial board type only!");
 		exit(1);
 	}
 	if (argc == 4)
@@ -325,13 +395,18 @@ static void do420OutRead(int argc, char *argv[])
 
 static void do420OutWrite(int argc, char *argv[])
 {
-  int dev, rawVal, pin;
+  int dev, rawVal, pin, bType;
   float val;
   int ret;
 	
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
+		exit(1);
+	}
+	if(bType != BOARD_TYPE_IND)
+	{
+		printf("Valid for Industrial board type only!");
 		exit(1);
 	}
 	if (argc != 5)
@@ -369,12 +444,17 @@ static void do420OutWrite(int argc, char *argv[])
 */
 static void do010InRead(int argc, char *argv[])
 {
-	int pin, dev, rd;
+	int pin, dev, rd, bType;
  float val;
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
+		exit(1);
+	}
+	if(bType != BOARD_TYPE_IND)
+	{
+		printf("Valid for Industrial board type only!");
 		exit(1);
 	}
 	if (argc == 4)
@@ -386,7 +466,7 @@ static void do010InRead(int argc, char *argv[])
 			exit(1);
 		}
 		rd = readReg16(dev, U0_10_IN_VAL1_ADD + 2*( pin -1));
-    val = rd/U_SCALE_FACTOR_V;
+		val = rd/U_SCALE_FACTOR_V;
 		printf("%0.3f\n", val);
 	}
 	else 
@@ -403,24 +483,28 @@ static void do010InRead(int argc, char *argv[])
 */
 static void do010OutRead(int argc, char *argv[])
 {
-	int pin, dev, rd;
- float val;
+	int pin, dev, rd, bType, maxCh = V_OUT_CH_MAX;
+	float val;
 
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
 	}
+	if(bType == BOARD_TYPE_BAS)
+	{
+		maxCh = BAS_V_OUT_CH_MAX;
+	}
 	if (argc == 4)
 	{
 		pin = atoi (argv [3]) ;
-		if((pin < CHANNEL_NR_MIN) || (pin > V_OUT_CH_MAX))
+		if((pin < CHANNEL_NR_MIN) || (pin > maxCh))
 		{
 			printf( "0-10V Output channel number %d out of range\n", pin);
 			exit(1);
 		}
 		rd = readReg16(dev, U0_10_OUT_VAL1_ADD + 2*( pin -1));
-    val = rd/U_SCALE_FACTOR_V;
+		val = rd/U_SCALE_FACTOR_V;
 		printf("%0.3f\n", val);
 	}
 	else 
@@ -437,14 +521,18 @@ static void do010OutRead(int argc, char *argv[])
 */
 static void do010OutWrite(int argc, char *argv[])
 {
-  int dev, rawVal, pin;
+  int dev, rawVal, pin, bType, maxCh = V_OUT_CH_MAX;
   float val;
   int ret;
 	
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
+	}
+	if(bType == BOARD_TYPE_BAS)
+	{
+		maxCh = BAS_V_OUT_CH_MAX;
 	}
 	if (argc != 5)
 	{
@@ -452,13 +540,13 @@ static void do010OutWrite(int argc, char *argv[])
 		exit (1) ;
 	}
  	pin = atoi (argv [3]) ;
-	if((pin < CHANNEL_NR_MIN) || (pin > V_OUT_CH_MAX))
+	if((pin < CHANNEL_NR_MIN) || (pin > maxCh))
 	{
-	  printf( "0-10V Output channel number %d out of range\n", pin);
-    exit(1);
-  }
+		printf( "0-10V Output channel number %d out of range\n", pin);
+		exit(1);
+	}
 	val = atof(argv[4]);
-  rawVal = (int)(val * U_SCALE_FACTOR_V);
+	rawVal = (int)(val * U_SCALE_FACTOR_V);
 	if((rawVal < U_OUT_VAL_MIN) || (rawVal > U_OUT_VAL_MAX))
 	{
 		printf( "0-10V  value out of range\n");
@@ -472,6 +560,45 @@ static void do010OutWrite(int argc, char *argv[])
 	}
 }
 
+/*
+* doResInRead:
+*	Read the input resisence (NTC 10k)
+************************************************************************************************
+*/
+
+static void doResInRead(int argc, char *argv[])
+{
+	int dev, rawVal, pin, bType;
+	
+	dev = doBoardInit (gHwAdd, &bType);
+	if(dev <= 0)
+	{		 
+		exit(1);
+	}
+	if(bType != BOARD_TYPE_BAS)
+	{
+		printf("Valid for Building Automation board type only!");
+		exit(1);
+	}
+	if (argc == 4)
+	{
+		pin = atoi (argv [3]) ;
+		if((pin < CHANNEL_NR_MIN) || (pin > R_CH_NR_MAX))
+		{
+			printf( "Res in channel number %d out of range\n", pin);
+			exit(1);
+		}
+		rawVal = readReg16(dev, R_10K_CH1 + 2*( pin -1));
+		
+		printf("%d\n", rawVal);
+	}
+	else 
+	{
+		printf( "Invalid number of arguments, type: megaioind -h %s\n", argv[2]);
+		exit (1) ;
+	} 
+}
+
 
 /*
 * doOptoInRead:
@@ -481,9 +608,9 @@ static void do010OutWrite(int argc, char *argv[])
 
 static void doOptoInRead(int argc, char *argv[])
 {
-  int pin, val, dev;
+  int pin, val, dev, bType;
 
-	dev = doBoardInit(gHwAdd);
+	dev = doBoardInit(gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
@@ -529,7 +656,7 @@ static void doOptoInRead(int argc, char *argv[])
 
 static void doOcOutWrite(int argc, char *argv[])
 {
-	int pin, val, dev, valR, valRmask, retry;
+	int pin, val, dev, valR, valRmask, retry, bType;
 
 	if ((argc != 5) && (argc != 4))
 	{
@@ -539,7 +666,7 @@ static void doOcOutWrite(int argc, char *argv[])
 		exit (1) ;
 	}
   
-	dev = doBoardInit (gHwAdd);
+	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
 		exit(1);
@@ -629,9 +756,9 @@ static void doOcOutWrite(int argc, char *argv[])
 */
 static void doOcOutRead(int argc, char *argv[])
 {
-  int pin, val, dev;
+  int pin, val, dev, bType;
 
-  dev = doBoardInit (gHwAdd);
+  dev = doBoardInit (gHwAdd, &bType);
   if(dev <= 0)
   {
      
@@ -751,6 +878,12 @@ void doHelp(int argc, char *argv[])
 			printf("\tUsage:       megaioind <id> wuout <value>\n");
 			printf("\tExample:     megaioind 0 wuout 1 5.33; Set 5.33V on output channel 1\n"); 
 		}
+		else if (strcasecmp (argv [2], "rresin"     ) == 0)	
+		{ 
+			printf("\trresin:      Read resistance Input in ohm's( NTC 10K)\n");
+			printf("\tUsage:       megaioind <id> rresin <channel>\n");
+			printf("\tExample:     megaioind 0 rresin 2; Read Value of Resistance input channel #2 on Board #0\n"); 
+		}
 		else if (strcasecmp (argv [2], "ropto"   ) == 0)	
 		{ 
 			printf("\toptread:     Read Optically Isolated Input bit or port\n");
@@ -792,7 +925,7 @@ void doBoard(int argc)
 	
 	if(argc == 3)
 	{
-		dev = doBoardInit(gHwAdd);
+		dev = doBoardInit(gHwAdd, &bType);
 		if(dev <= 0)
 		{			 
 			exit(1);
@@ -801,14 +934,16 @@ void doBoard(int argc)
 		hwMinor = readReg8(dev, REVISION_HW_MINOR_MEM_ADD);
 		major = readReg8(dev, REVISION_MAJOR_MEM_ADD);
 		minor = readReg8(dev, REVISION_MINOR_MEM_ADD);
-		bType = readReg8(dev, BOARD_TYPE_MEM_ADD);
+		//bType = readReg8(dev, BOARD_TYPE_MEM_ADD);
 		switch (bType)
 		{
 		case BOARD_TYPE_IND:
 			printf("MegaIO Industrial Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
+			printf("%s", indConnStr);
 			break;
 		case BOARD_TYPE_BAS:
 			printf("MegaIO Building Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
+			printf("%s", basConnStr);
 			break;
 		default:
 			printf("Invalid board Type\n");
@@ -823,7 +958,7 @@ void doBoard(int argc)
 
 static void doVersion(void)
 {
-	printf("MegaIO Industrial v%d.%d.%d Copyright (c) 2016 - 2018 Sequent Microsystems\n", VERSION_BASE, VERSION_MAJOR, VERSION_MINOR);
+	printf("MegaIO Industrial v%d.%d.%d Copyright (c) 2016 - 2019 Sequent Microsystems\n", VERSION_BASE, VERSION_MAJOR, VERSION_MINOR);
 	printf("\nThis is free software with ABSOLUTELY NO WARRANTY.\n");
 	printf("For details type: megaioind -warranty\n");
 
@@ -894,6 +1029,7 @@ int main(int argc, char *argv [])
   else if (strcasecmp (argv [2], "ruin"    ) == 0)	{ do010InRead      (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "ruout"   ) == 0)	{ do010OutRead     (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "wuout"   ) == 0)	{ do010OutWrite    (argc, argv) ;	return 0 ; }
+  else if (strcasecmp (argv [2], "rresin"  ) == 0)	{ doResInRead	   (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "ropto"   ) == 0)	{ doOptoInRead     (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "board"   ) == 0)	{ doBoard          (argc) 		;	return 0 ; } 
   else if (strcasecmp (argv [2], "woc"     ) == 0)	{ doOcOutWrite     (argc, argv) ;	return 0 ; }

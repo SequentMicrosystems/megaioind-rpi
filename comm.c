@@ -146,7 +146,7 @@ int writeReg24(int dev, int add, int val)
 }
 
 	
-int doBoardInit(int hwAdd)
+int doBoardInit(int hwAdd, int* type)
 {
 	int dev, bV = -1;
 	dev = wiringPiI2CSetup (hwAdd);
@@ -154,12 +154,14 @@ int doBoardInit(int hwAdd)
 	{
 		return ERROR;
 	}
-	bV = wiringPiI2CReadReg8 (dev,REVISION_HW_MAJOR_MEM_ADD);
+	bV = wiringPiI2CReadReg8 (dev,BOARD_TYPE_MEM_ADD);
 	if(bV == -1)
 	{
 		printf( "MegaIO Industrial id %d not detected\n", hwAdd - MEGAIO_HW_I2C_BASE_ADD);
 		return ERROR;
 	}
+	*type = bV;
+
 	return dev;
 }
 

@@ -103,8 +103,10 @@ enum
 #define CRT_OUT_CH_NR_MAX  4
 #define V_IN_CH_MAX        4
 #define V_OUT_CH_MAX        4
+#define BAS_V_OUT_CH_MAX	8
 #define OPTO_CH_NR_MAX		4
 #define OC_CH_NR_MAX		4
+#define R_CH_NR_MAX			4
 
 
 #define CRT_OUT_VAL_MIN  4000
@@ -160,7 +162,7 @@ int writeReg24(int dev, int add, int val);
 void printbits(int v);
 int writeReg8(int dev, int add, int val);
 int readReg8(int dev, int add);
-int doBoardInit(int hwAdd);
+int doBoardInit(int hwAdd, int* type);
 int getLedVal(int chip);
 int setLedVal(int chip, int val);
 void busyWait(int ms);

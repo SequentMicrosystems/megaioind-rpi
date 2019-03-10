@@ -7,4 +7,9 @@ Version 1.0.0:
 Version 1.0.1:
    Solve usage string
    Solve -h command 
+Version 1.1.0:
+   Add suport for Buildings Autometion board type
+   Add rresin command
+   Check board type    
+   Display connectors sygnals 
    
