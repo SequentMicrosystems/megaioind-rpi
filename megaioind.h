@@ -2,7 +2,9 @@
 #ifndef MEGAIO_H_
 #define MEGAIO_H_
 
-#define RETRY_TIMES	10
+#define UNUSED(x) ((void)(x))
+
+#define RETRY_TIMES	20
 
 enum
 {
@@ -71,6 +73,21 @@ enum
 	MBS2,
 	MBS3,
 	MODBUS_ID_OFFSET_ADD,
+	RTC_YEAR_ADD,
+	RTC_MONTH_ADD,
+	RTC_DAY_ADD,
+	RTC_HOUR_ADD,
+	RTC_MINUTE_ADD,
+	RTC_SECOND_ADD,
+
+	RTC_SET_YEAR_ADD,
+	RTC_SET_MONTH_ADD,
+	RTC_SET_DAY_ADD,
+	RTC_SET_HOUR_ADD,
+	RTC_SET_MINUTE_ADD,
+	RTC_SET_SECOND_ADD,
+	RTC_CMD,
+	
 
 	DIAG_TEMPERATURE_MEM_ADD = 0x72,
 	DIAG_24V_MEM_ADD,
@@ -89,7 +106,7 @@ enum
 
 };
 
-
+#define SET_TIME_KEY	0xA5
 #define GPIO_PIN_NUMBER					(u8)6
 
 
@@ -153,6 +170,17 @@ enum
 	BOARD_TYPE_BAS
 };
 
+typedef struct
+__attribute__((packed))
+	{
+		u8 y;
+		u8 m;
+		u8 d;
+		u8 h;
+		u8 min;
+		u8 s;
+	} RtcStructType;
+	
 void startThread(void);
 int checkThreadResult(void);
 int readReg16(int dev, int add);
@@ -166,5 +194,7 @@ int doBoardInit(int hwAdd, int* type);
 int getLedVal(int chip);
 int setLedVal(int chip, int val);
 void busyWait(int ms);
+int readBuff(int dev, uint8_t* buff, int add, int size);
+int writeBuff(int dev, uint8_t* buff, int add, int size);
 
 #endif //MEGAIO_H_

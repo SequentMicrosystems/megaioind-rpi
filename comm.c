@@ -145,6 +145,38 @@ int writeReg24(int dev, int add, int val)
 	return 0;
 }
 
+int readBuff(int dev, uint8_t* buff, int add, int size)
+{
+	int i, val, ret = 0;
+	
+	for(i = 0; i< size; i++)
+	{
+		val = wiringPiI2CReadReg8(dev, add + i);
+		if(val == -1)
+		{
+			return -1;
+		}
+		buff[i] = 0xff & val;
+		ret++;
+	}
+	return ret;
+}
+
+int writeBuff(int dev, uint8_t* buff, int add, int size)
+{
+	int i, val, ret = 0;
+	
+	for(i = 0; i< size; i++)
+	{
+		val = wiringPiI2CWriteReg8(dev, add + i, buff[i]);
+		if(val == -1)
+		{
+			return -1;
+		}
+		ret++;
+	}
+	return ret;
+}
 	
 int doBoardInit(int hwAdd, int* type)
 {

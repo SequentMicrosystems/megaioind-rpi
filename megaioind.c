@@ -19,14 +19,64 @@
 #include <math.h>
 #include "megaioind.h"
 
+#define OK 1
+#define ERROR -1
+
+#define V_IN_SCALE_FACTOR	(float)1000
+
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)0
+#define VERSION_MINOR	(int)3
+
+#define RTC_MIN_DAY		1
+#define RTC_MAX_DAY		31
+#define RTC_MIN_MONTH	1
+#define RTC_MAX_MONTH	12
+#define RTC_MIN_YEAR  2000
+#define RTC_MAX_YEAR  2255
+#define RTC_MIN_HOUR	0
+#define RTC_MAX_HOUR	23
+#define RTC_MIN_MIN		0
+#define RTC_MAX_MIN		59
+#define RTC_MIN_SEC		0
+#define RTC_MAX_SEC		59
+
+enum{
+	MB_TYPE_NONE = 0,
+	MB_TYPE_RTU,
+	MB_TYPE_ASCII
+};
+
+enum{
+	MB_PARITY_NONE = 0,
+	MB_PARITY_ODD,
+	MB_PARITY_EVEN
+};
+enum{
+	MB_SB_1 = 0,
+	MB_SB_2,
+	MB_SB_1_5,
+};
+
 
 int gHwAdd = MEGAIO_HW_I2C_BASE_ADD;
 
 
+typedef struct	__attribute__((packed))
+{
+	unsigned int mbBaud :26;
+	unsigned int mbType :2;
+	unsigned int mbParity :2;
+	unsigned int mbStopB :2;
+} ModbusSetingsType;
 
+int extractInt(char* str, int pos, int len);
+int extractDate(char* str, RtcStructType* rtc);
+int extractTime(char* str, RtcStructType* rtc);
+
+const char* gMbType[3] = {"NONE", "RTU", "ASCII"};
+const char* gMbParity[3] = {"NONE", "ODD", "EVEN"};
+const char* gMbStopBits[3] = {"ONE", "TWO", "ONE_AND_HALF"};
 
 			  
 char *warranty ="	       Copyright (c) 2016-2019 Sequent Microsystems\n"
@@ -64,8 +114,8 @@ char *passStr = "    ########     ###     ######   ######  \n"
         				"    ##        ##     ##  ######   ######  \n";
 						
 char *indConnStr = 	"------------------------------------------------------------\n"
-					"|o| +24                                       0-10V OUT4 |o|\n"
-					"|o| GND                                             GND  |o|\n"
+					"|o| +24          SequentMicrosystems.com      0-10V OUT4 |o|\n"
+					"|o| GND      MegaIO for Industrial Automation       GND  |o|\n"
 					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
 					"|o| 0-10V IN3                                       GND  |o|\n"
 					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
@@ -94,8 +144,8 @@ char *indConnStr = 	"-----------------------------------------------------------
 					"------------------------------------------------------------\n";	
 
 char *basConnStr = 	"------------------------------------------------------------\n"
-					"|o| +24                                       0-10V OUT4 |o|\n"
-					"|o| GND                                             GND  |o|\n"
+					"|o| +24         SequentMicrosystems.com       0-10V OUT4 |o|\n"
+					"|o| GND      MegaIO for Buildings Automation        GND  |o|\n"
 					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
 					"|o| 0-10V IN3                                       GND  |o|\n"
 					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
@@ -130,6 +180,72 @@ void printbits(int v)
 	for(i = 17; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
 
+int extractInt(char* str, int pos, int len)
+{
+  char aux[10];
+  
+  memset(aux, 0, 10);
+  memcpy(aux, &str[pos], len);
+  //printf("%s\n", aux);
+  
+  return atoi(aux);
+}
+
+int extractDate(char* str, RtcStructType* rtc)
+{
+  int i;
+  
+  i = extractInt(str, 0, 2);
+  if(i < RTC_MIN_DAY && i > RTC_MAX_DAY)
+  {
+    return ERROR;
+  }
+  rtc->d = (uint8_t)i;
+  
+  i = extractInt(str, 3, 2);
+  if(i < RTC_MIN_MONTH && i > RTC_MAX_MONTH)
+  {
+    return ERROR;  
+  }
+  rtc->m = (uint8_t)i;
+  
+  i = extractInt(str, 6, 4);
+  if(i < RTC_MIN_YEAR && i > RTC_MAX_YEAR)
+  {
+    return ERROR;
+  }
+  rtc->y = (uint8_t)(i - 2000);
+  
+  return OK;
+}
+
+int extractTime(char* str, RtcStructType* rtc)
+{
+  int i;
+  
+  i = extractInt(str, 0, 2);
+  if(i < RTC_MIN_HOUR && i > RTC_MAX_HOUR)
+  {
+    return ERROR;
+  }
+  rtc->h = (uint8_t)i;
+  
+  i = extractInt(str, 3, 2);
+  if(i < RTC_MIN_MIN && i > RTC_MAX_MIN)
+  {
+    return ERROR;  
+  }
+  rtc->min = (uint8_t)i;
+  
+  i = extractInt(str, 6, 2);
+  if(i < RTC_MIN_SEC && i > RTC_MAX_SEC)
+  {
+    return ERROR;
+  }
+  rtc->s = (uint8_t)i;
+  
+  return OK;
+}
 
 // set ON/OFF specify relay channel
 int relayChSet(int dev, u8 channel, OutStateEnumType state)
@@ -660,8 +776,8 @@ static void doOcOutWrite(int argc, char *argv[])
 
 	if ((argc != 5) && (argc != 4))
 	{
-		printf( "Usage: megaioind <id> ocwrite <oc number> <on/off> \n") ;
-		printf( "Usage: megaioind <id> ocwrite <oc reg value> \n") ;
+		printf( "Usage: megaioind <id>  <oc number> <on/off> \n") ;
+		printf( "Usage: megaioind <id> ocwrocwriteite <oc reg value> \n") ;
     
 		exit (1) ;
 	}
@@ -798,6 +914,79 @@ static void doOcOutRead(int argc, char *argv[])
   
 }
 
+static void doTimeGet(int argc, char *argv[])
+{
+	int dev, bType, ret;
+	RtcStructType rtc;
+  
+  UNUSED(argv);
+  if(argc != 3)
+  {
+    printf("Invalid number of parameters type: megaioind -h time\n");
+    exit(1);
+  }
+  
+	dev = doBoardInit (gHwAdd, &bType);
+	if(dev <= 0)
+	{  
+		exit(1);
+	}
+	ret = readBuff(dev, (uint8_t*)&rtc, RTC_YEAR_ADD, sizeof(RtcStructType));
+  if(ret > 0)
+  {
+    printf("%02d/%02d/%04d %02d:%02d:%02d\n", rtc.d, rtc.m, rtc.y+2000, rtc.h, rtc.min, rtc.s);
+  }
+  else
+  {
+    printf("Fail to read time\n");
+    exit(1);
+  }
+	
+}
+
+static void doTimeSet(int argc, char *argv[])
+{
+	int dev, bType, ret;
+	RtcStructType rtc;
+  
+  if(argc != 5)
+  {
+    printf("Invalid number of parameters type: megaioind -h stime\n");
+    exit(1);
+  }
+  
+  if(OK != extractDate(argv[3], &rtc))
+  {
+    printf("Invalid parameter : date\n");
+    exit(-1);
+  }
+  
+  if(OK != extractTime(argv[4], &rtc))
+  {
+    printf("Invalid parameter : time\n");
+    exit(-1);
+  }
+ 
+  //printf("%02d/%02d/%d %02d:%02d:%02d\n", rtc.d, rtc.m, rtc.y+2000, rtc.h, rtc.min, rtc.s);
+	dev = doBoardInit (gHwAdd, &bType);
+	if(dev <= 0)
+	{  
+		exit(1);
+	}
+	ret = writeBuff(dev, (uint8_t*)&rtc, RTC_SET_YEAR_ADD, sizeof(RtcStructType));
+  if(ret < 0)
+  {
+    printf("Fail to set time\n");
+    exit(1);
+  }
+  if(writeReg8(dev, RTC_CMD, SET_TIME_KEY) < 0)
+  {
+    printf("Fail to set time\n");
+    exit(1);
+  }
+	
+}
+
  char *usage = "Usage:	 megaioind -h <command>\n"
 		"         megaioind -v\n"
 		"         megaioind -warranty\n"
@@ -811,11 +1000,14 @@ static void doOcOutRead(int argc, char *argv[])
     "         megaioind <id> ruin <channel>\n"
     "         megaioind <id> ruout <channel>\n"
     "         megaioind <id> wuout <channel> <value>\n"
+    "         megaioind <id> rresin <channel>\n"
     "         megaioind <id> ropto <channel>\n"
     "         megaioind <id> ropto\n"
 		"         megaioind <id> roc\n"
 		"         megaioind <id> woc <ch> <on/off; 1/0>\n"
 		"         megaioind <id> woc <val>\n"
+    "         megaioind <id> time\n"
+    "         megaioind <id> stime <dd/mm/yyyy> <hh:mm:ss>\n"
 		"Where: <id> = Board level id = 0..3\n"
 		"Type megaioind -h <command> for more help";// No trailing newline needed here.
    
@@ -905,6 +1097,18 @@ void doHelp(int argc, char *argv[])
 			printf("\tUsage:    megaioind <id> ocwrite <ch> <val>\n");
 			printf("\tExample:  megaio 0 ocwrite 2 on\n");
 		}
+    else if(strcasecmp(argv[2], "time") == 0)
+		{
+			printf("\ttime:     Read the time and date\n");
+			printf("\tUsage:    megaioind <id> time\n");
+			printf("\tExample:  megaio 0 time\n");
+		}
+    else if(strcasecmp(argv[2], "stime") == 0)
+		{
+			printf("\ttime:     Set the time and date\n");
+			printf("\tUsage:    megaioind <id> stime <dd/mm/yyyy> <hh:mm:ss>\n");
+			printf("\tExample:  megaio 0 stime 05/03/2018 01:09:14\n");
+		}
 		else
 		{
 			printf("Invalid command!\n");
@@ -921,6 +1125,8 @@ void doBoard(int argc)
 {
 	int dev, hwMajor, hwMinor, minor , major;
 	int bType = 0;
+	int val;
+	float vIn, vRasp;
 	
 	
 	if(argc == 3)
@@ -934,7 +1140,12 @@ void doBoard(int argc)
 		hwMinor = readReg8(dev, REVISION_HW_MINOR_MEM_ADD);
 		major = readReg8(dev, REVISION_MAJOR_MEM_ADD);
 		minor = readReg8(dev, REVISION_MINOR_MEM_ADD);
-		//bType = readReg8(dev, BOARD_TYPE_MEM_ADD);
+		val = readReg16(dev, DIAG_24V_MEM_ADD);
+		vIn = (float)val/V_IN_SCALE_FACTOR;
+		val = readReg16(dev, DIAG_5V_MEM_ADD);
+		vRasp = (float)val/V_IN_SCALE_FACTOR;
+		val = readReg8(dev, DIAG_TEMPERATURE_MEM_ADD);
+		
 		switch (bType)
 		{
 		case BOARD_TYPE_IND:
@@ -949,6 +1160,7 @@ void doBoard(int argc)
 			printf("Invalid board Type\n");
 			break;
 		}
+		printf("VCC %.02fV\tV Raspberry %.02fV\t CPU Temperature %dC\n", vIn, vRasp, val);
 	}
 	else
 	{
@@ -1032,6 +1244,8 @@ int main(int argc, char *argv [])
   else if (strcasecmp (argv [2], "rresin"  ) == 0)	{ doResInRead	   (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "ropto"   ) == 0)	{ doOptoInRead     (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "board"   ) == 0)	{ doBoard          (argc) 		;	return 0 ; } 
+  else if (strcasecmp (argv [2], "time"    ) == 0)	{ doTimeGet        (argc, argv) ;	return 0 ; }
+  else if (strcasecmp (argv [2], "stime"    ) == 0)	{ doTimeSet        (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "woc"     ) == 0)	{ doOcOutWrite     (argc, argv) ;	return 0 ; }
   else if (strcasecmp (argv [2], "roc"     ) == 0)	{ doOcOutRead      (argc, argv) ;	return 0 ; }
   else 

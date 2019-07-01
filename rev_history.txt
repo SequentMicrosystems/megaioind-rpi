@@ -12,4 +12,5 @@ Version 1.1.0:
    Add rresin command
    Check board type    
    Display connectors sygnals 
-   
+Version 1.1.3:
+   Add suport for rtc read and set   
