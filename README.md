@@ -26,3 +26,19 @@ If you clone the repository any update can be made with the following commands:
 ~/megaioind-rpi$ git pull
 ~/megaioind-rpi$ sudo make install
 ```  
+## Firmware update
+
+Now you can update board firmware with latest version from our website and for that Raspberry must be connected to internet. We recomend you to disconnect all outputs from board before update, during update outputs my change and can damage your external equipaments. 
+
+For first usage you must set execution rights for the update program.
+
+```bash
+~$ cd megaioind-rpi/update/
+~/megaioind-rpi/update$ chmod 777 update
+```
+To update you must execute the program with stack level (jumper settings) of your board
+
+```bash
+~$ cd megaioind-rpi/update/
+~/megaioind-rpi/update$ ./update 0
+```
