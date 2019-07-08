@@ -3,7 +3,7 @@
 
 # megaioind-rpi
 
-This is the command to control the [Industrial](https://www.sequentmicrosystems.com/megaio-ind.html) and  [Building](https://www.sequentmicrosystems.com/megaio-bas.html) I/O Expansion cards for Raspberry Pi.
+This is the command to control the [Industrial](https://www.sequentmicrosystems.com/megaio-ind.html) and [Building](https://www.sequentmicrosystems.com/megaio-bas.html) Automation I/O Expansion cards for Raspberry Pi.
 
 Before compiling you have to install [Wiring Pi](http://wiringpi.com/download-and-install/), many thanks to Gordon Henderson for the library
 
