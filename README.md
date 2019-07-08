@@ -3,7 +3,7 @@
 
 # megaioind-rpi
 
-This is the command to control [Mega-IO Industrial Card](https://www.sequentmicrosystems.com/megaio-ind.html)
+This is the command to control the [Mega-IO Industrial Card](https://www.sequentmicrosystems.com/megaio-ind.html)
 
 Before compiling you have to install [Wiring Pi](http://wiringpi.com/download-and-install/), many thanks to Gordon Henderson for the library
 
