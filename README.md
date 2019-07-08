@@ -15,6 +15,7 @@ Before compiling please install [Wiring Pi](http://wiringpi.com/download-and-ins
 ~/megaioind-rpi$ sudo make install
 ```
 
+To access the functions of the Mega
 Now you can access all the functions of the MegaIO Industrial board through the command "megaioind".
 
 Type megaioind -h for command options list.
