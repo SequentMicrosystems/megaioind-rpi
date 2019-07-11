@@ -26,7 +26,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)3
+#define VERSION_MINOR	(int)4
 
 #define RTC_MIN_DAY		1
 #define RTC_MAX_DAY		31
@@ -114,65 +114,89 @@ char *passStr = "    ########     ###     ######   ######  \n"
         				"    ##        ##     ##  ######   ######  \n";
 						
 char *indConnStr = 	"------------------------------------------------------------\n"
-					"|o| +24          SequentMicrosystems.com      0-10V OUT4 |o|\n"
-					"|o| GND      MegaIO for Industrial Automation       GND  |o|\n"
-					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
-					"|o| 0-10V IN3                                       GND  |o|\n"
-					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
-					"|o| GND                                             GND  |o|\n"
-					"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
-					"|o| GND                                             GND  |o|\n"
-					"------------------------------------------------------------\n"
-					"|o| 4-20mA IN4-                                      GND |o|\n"
-					"|o| 4-20mA IN4+                              4-20mA OUT4 |o|\n"
-					"|o| 4-20mA IN3-                                      GND |o|\n"
-					"|o| 4-20mA IN3+                              4-20mA OUT3 |o|\n"
-					"|o| 4-20mA IN2-                                      GND |o|\n"
-					"|o| 4-20mA IN2+                              4-20mA OUT2 |o|\n"
-					"|o| 4-20mA IN1-                                      GND |o|\n"
-					"|o| 4-20mA IN1+                              4-20mA OUT1 |o|\n"
-					"------------------------------------------------------------\n"
-					"------------------------------------------------------------\n"
-					"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
-					"|o| OPTO IN4+                                        GND |o|\n"
-					"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
-					"|o| OPTO IN3+                                        GND |o|\n"
-					"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
-					"|o| OPTO IN2+                                        GND |o|\n"
-					"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
-					"|o| OPTO IN1+                                        GND |o|\n"
-					"------------------------------------------------------------\n";	
+"|	          Rasperry Pi Connector                    |\n"
+"|           o o o o o o o o o o o o o o o o o o o o        |\n"
+"|      Pin1-o o o o o o o o o o o o o o o o o o o o        |\n"
+"------------------------------------------------------------\n"
+"|o| +24                 |o||o||o||o||o||o|    0-10V OUT4 |o|\n"
+"|o| GND                  1  G  C  C  4  4           GND  |o|\n"
+"|o| 0-10V IN4            W  N  A  A  8  8     0-10V OUT3 |o|\n"
+"|o| 0-10V IN3            I  D  N  N  5  5           GND  |o|\n"
+"|o| 0-10V IN2            R     |  |  |  |     0-10V OUT2 |o|\n"
+"|o| GND                  E     L  H  A  B           GND  |o|\n"
+"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
+"|o| GND                                             GND  |o|\n"
+"------------------------------------------------------------\n"
+"|o| 4-20mA IN4-                                      GND |o|\n"
+"|o| 4-20mA IN4+                              4-20mA OUT4 |o|\n"
+"|o| 4-20mA IN3-                                      GND |o|\n"
+"|o| 4-20mA IN3+                              4-20mA OUT3 |o|\n"
+"|o| 4-20mA IN2-                                      GND |o|\n"
+"|o| 4-20mA IN2+                              4-20mA OUT2 |o|\n"
+"|o| 4-20mA IN1-                                      GND |o|\n"
+"|o| 4-20mA IN1+                              4-20mA OUT1 |o|\n"
+"------------------------------------------------------------\n"
+"------------------------------------------------------------\n"
+"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
+"|o| OPTO IN4+                                        GND |o|\n"
+"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
+"|o| OPTO IN3+                                        GND |o|\n"
+"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
+"|o| OPTO IN2+                                        GND |o|\n"
+"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
+"|o| OPTO IN1+                                        GND |o|\n"
+"------------------------------------------------------------\n"
+"------------------------------------------------------------\n"
+"|  |O||O||O|     |O||O||O|     |O||O||O|     |O||O||O|     |\n"
+"|   R  R  R       R  R  R       R  R  R       R  R  R      |\n"
+"|   1  1  1       2  2  2       3  3  3       4  4  4      |\n"
+"|   N  C  N       N  C  N       N  C  N       N  C  N      |\n"
+"|   O  O  C       O  O  C       O  O  C       O  O  C      |\n"
+"|      M             M             M             M         |\n"
+"------------------------------------------------------------\n";
 
 char *basConnStr = 	"------------------------------------------------------------\n"
-					"|o| +24         SequentMicrosystems.com       0-10V OUT4 |o|\n"
-					"|o| GND      MegaIO for Buildings Automation        GND  |o|\n"
-					"|o| 0-10V IN4                                 0-10V OUT3 |o|\n"
-					"|o| 0-10V IN3                                       GND  |o|\n"
-					"|o| 0-10V IN2                                 0-10V OUT2 |o|\n"
-					"|o| GND                                             GND  |o|\n"
-					"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
-					"|o| GND                                             GND  |o|\n"
-					"------------------------------------------------------------\n"
-					"|o| 10K TH IN4-                                      GND |o|\n"
-					"|o| 10K TH IN4+                               0-10V OUT8 |o|\n"
-					"|o| 10K TH IN3-                                      GND |o|\n"
-					"|o| 10K TH IN3+                               0-10V OUT7 |o|\n"
-					"|o| 10K TH IN2-                                      GND |o|\n"
-					"|o| 10K TH IN2+                               0-10V OUT6 |o|\n"
-					"|o| 10K TH IN1-                                      GND |o|\n"
-					"|o| 10K TH IN1+                               0-10V OUT5 |o|\n"
-					"------------------------------------------------------------\n"
-					"------------------------------------------------------------\n"
-					"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
-					"|o| OPTO IN4+                                        GND |o|\n"
-					"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
-					"|o| OPTO IN3+                                        GND |o|\n"
-					"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
-					"|o| OPTO IN2+                                        GND |o|\n"
-					"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
-					"|o| OPTO IN1+                                        GND |o|\n"
-					"------------------------------------------------------------\n";					
-		  
+"|	          Rasperry Pi Connector                    |\n"
+"|           o o o o o o o o o o o o o o o o o o o o        |\n"
+"|      Pin1-o o o o o o o o o o o o o o o o o o o o        |\n"
+"------------------------------------------------------------\n"
+"|o| +24                 |o||o||o||o||o||o|    0-10V OUT4 |o|\n"
+"|o| GND                  1  G  C  C  4  4           GND  |o|\n"
+"|o| 0-10V IN4            W  N  A  A  8  8     0-10V OUT3 |o|\n"
+"|o| 0-10V IN3            I  D  N  N  5  5           GND  |o|\n"
+"|o| 0-10V IN2            R     |  |  |  |     0-10V OUT2 |o|\n"
+"|o| GND                  E     L  H  A  B           GND  |o|\n"
+"|o| 0-10V IN1                                 0-10V OUT1 |o|\n"
+"|o| GND                                             GND  |o|\n"
+"------------------------------------------------------------\n"
+"|o| 10K TH IN4-                                      GND |o|\n"
+"|o| 10K TH IN4+                               0-10V OUT8 |o|\n"
+"|o| 10K TH IN3-                                      GND |o|\n"
+"|o| 10K TH IN3+                               0-10V OUT7 |o|\n"
+"|o| 10K TH IN2-                                      GND |o|\n"
+"|o| 10K TH IN2+                               0-10V OUT6 |o|\n"
+"|o| 10K TH IN1-                                      GND |o|\n"
+"|o| 10K TH IN1+                               0-10V OUT5 |o|\n"
+"------------------------------------------------------------\n"
+"------------------------------------------------------------\n"
+"|o| OPTO IN4-                            OPEN DRAIN OUT4 |o|\n"
+"|o| OPTO IN4+                                        GND |o|\n"
+"|o| OPTO IN3-                            OPEN DRAIN OUT3 |o|\n"
+"|o| OPTO IN3+                                        GND |o|\n"
+"|o| OPTO IN2-                            OPEN DRAIN OUT2 |o|\n"
+"|o| OPTO IN2+                                        GND |o|\n"
+"|o| OPTO IN1-                            OPEN DRAIN OUT1 |o|\n"
+"|o| OPTO IN1+                                        GND |o|\n"
+"------------------------------------------------------------\n"
+"------------------------------------------------------------\n"
+"|  |O||O||O|     |O||O||O|     |O||O||O|     |O||O||O|     |\n"
+"|   R  R  R       R  R  R       R  R  R       R  R  R      |\n"
+"|   1  1  1       2  2  2       3  3  3       4  4  4      |\n"
+"|   N  C  N       N  C  N       N  C  N       N  C  N      |\n"
+"|   O  O  C       O  O  C       O  O  C       O  O  C      |\n"
+"|      M             M             M             M         |\n"
+"------------------------------------------------------------\n";
+
 void printbits(int v) 
 {
 	int i; // for C89 compatibility
@@ -195,14 +219,14 @@ int extractDate(char* str, RtcStructType* rtc)
 {
   int i;
   
-  i = extractInt(str, 0, 2);
+  i = extractInt(str, 3, 2);
   if(i < RTC_MIN_DAY && i > RTC_MAX_DAY)
   {
     return ERROR;
   }
   rtc->d = (uint8_t)i;
   
-  i = extractInt(str, 3, 2);
+  i = extractInt(str, 0, 2);
   if(i < RTC_MIN_MONTH && i > RTC_MAX_MONTH)
   {
     return ERROR;  
@@ -934,7 +958,7 @@ static void doTimeGet(int argc, char *argv[])
 	ret = readBuff(dev, (uint8_t*)&rtc, RTC_YEAR_ADD, sizeof(RtcStructType));
   if(ret > 0)
   {
-    printf("%02d/%02d/%04d %02d:%02d:%02d\n", rtc.d, rtc.m, rtc.y+2000, rtc.h, rtc.min, rtc.s);
+    printf("%02d/%02d/%04d %02d:%02d:%02d\n", rtc.m, rtc.d, rtc.y+2000, rtc.h, rtc.min, rtc.s);
   }
   else
   {
@@ -1023,7 +1047,7 @@ void doHelp(int argc, char *argv[])
 		}
 		else if (strcasecmp (argv [2], "board"     ) == 0)	
 		{ 
-			printf("\tboard:       Check MegaIO Industrial Board Hardware and Software Version\n");
+			printf("\tboard:       Show Hardware and Software Version, I/O Pinout & Voltages\n");
 			printf("\tUsage:       megaioind <id> board\n");
 			printf("\tExample:     megaioind 0 board\n"); 
 		}
@@ -1042,7 +1066,7 @@ void doHelp(int argc, char *argv[])
 		}
     else if (strcasecmp (argv [2], "riout"     ) == 0)	
 		{ 
-			printf("\triout:        Read 4 - 20 mA Output\n");
+			printf("\triout:       Read 4 - 20 mA Output\n");
 			printf("\tUsage:       megaioind <id> riout <channel>\n");
 			printf("\tExample:     megaioind 0 riout 2; Read Value of 4 -20mA output channel #2 on Board #0\n"); 
 		}
@@ -1072,42 +1096,42 @@ void doHelp(int argc, char *argv[])
 		}
 		else if (strcasecmp (argv [2], "rresin"     ) == 0)	
 		{ 
-			printf("\trresin:      Read resistance Input in ohm's( NTC 10K)\n");
+			printf("\trresin:      Read resistance Input in ohm's( NTC 10K)- MegaIO-BAS only!\n");
 			printf("\tUsage:       megaioind <id> rresin <channel>\n");
 			printf("\tExample:     megaioind 0 rresin 2; Read Value of Resistance input channel #2 on Board #0\n"); 
 		}
 		else if (strcasecmp (argv [2], "ropto"   ) == 0)	
 		{ 
 			printf("\toptread:     Read Optically Isolated Input bit or port\n");
-			printf("\tUsage:       megaioind <id> optread (<channel>)\n");
-			printf("\tExample:     megaio 0 optread; Read all optically isolated inputs\n"); 
-			printf("\tExample:     megaio 0 optread 3; Read optically isolated input #3\n"); 
+			printf("\tUsage:       megaioind <id> ropto (<channel>)\n");
+			printf("\tExample:     megaioind 0 ropto; Read all optically isolated inputs\n"); 
+			printf("\tExample:     megaioind 0 ropto 3; Read optically isolated input #3\n"); 
 		}		
 		else if(strcasecmp(argv[2], "roc") == 0)
 		{
-			printf("\tocread:   Read the open-collector output's\n");
-			printf("\tUsage:    megaioind <id> ocread\n");
-			printf("\tExample:  megaio 0 ocread\n");
+			printf("\tocread:      Read the open-collector output's\n");
+			printf("\tUsage:       megaioind <id> roc\n");
+			printf("\tExample:     megaioond 0 roc\n");
 		}
 		else if(strcasecmp(argv[2], "woc") == 0)
 		{
-			printf("\tocwrite:  Write the open-collectot output's\n");
-			printf("\tUsage:    megaioind <id> ocwrite <val>\n");
-			printf("\tExample:  megaio 0 ocwrite 5\n");
-			printf("\tUsage:    megaioind <id> ocwrite <ch> <val>\n");
-			printf("\tExample:  megaio 0 ocwrite 2 on\n");
+			printf("\tocwrite:     Write the open-collectot output's\n");
+			printf("\tUsage:       megaioind <id> woc <val>\n");
+			printf("\tExample:     megaioind 0 woc 5\n");
+			printf("\tUsage:       megaioind <id> woc <ch> <val>\n");
+			printf("\tExample:     megaioind 0 woc 2 on\n");
 		}
     else if(strcasecmp(argv[2], "time") == 0)
 		{
-			printf("\ttime:     Read the time and date\n");
-			printf("\tUsage:    megaioind <id> time\n");
-			printf("\tExample:  megaio 0 time\n");
+			printf("\ttime:        Display the board time and date (mm/dd/yyyy hh:mm:ss)\n");
+			printf("\tUsage:       megaioind <id> time\n");
+			printf("\tExample:     megaioind 0 time\n");
 		}
     else if(strcasecmp(argv[2], "stime") == 0)
 		{
-			printf("\ttime:     Set the time and date\n");
-			printf("\tUsage:    megaioind <id> stime <dd/mm/yyyy> <hh:mm:ss>\n");
-			printf("\tExample:  megaio 0 stime 05/03/2018 01:09:14\n");
+			printf("\ttime:        Set the time and date\n");
+			printf("\tUsage:       megaioind <id> stime <mm/dd/yyyy> <hh:mm:ss>\n");
+			printf("\tExample:     megaioind 0 stime 05/03/2018 01:09:14\n");
 		}
 		else
 		{
@@ -1149,18 +1173,20 @@ void doBoard(int argc)
 		switch (bType)
 		{
 		case BOARD_TYPE_IND:
-			printf("MegaIO Industrial Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
-			printf("%s", indConnStr);
+			printf("MegaIO IND Board Version %d.%d\tFirmware Version %d.%d\n", hwMajor, hwMinor, major, minor);
+      printf("VIN %.02fV\tVCC Raspberry %.02fV\t CPU Temperature %dºC\n", vIn, vRasp, val);
+      printf("%s", indConnStr);
 			break;
 		case BOARD_TYPE_BAS:
-			printf("MegaIO Building Automation Hardware version %d.%d Firmware version %d.%d\n", hwMajor, hwMinor, major, minor);
-			printf("%s", basConnStr);
+			printf("MegaIO BAS Board Version %d.%d\tFirmware Version %d.%d\n", hwMajor, hwMinor, major, minor);
+			printf("VIN %.02fV\tVCC Raspberry %.02fV\t CPU Temperature %dºC\n", vIn, vRasp, val);
+      printf("%s", basConnStr);
 			break;
 		default:
 			printf("Invalid board Type\n");
 			break;
 		}
-		printf("VCC %.02fV\tV Raspberry %.02fV\t CPU Temperature %dC\n", vIn, vRasp, val);
+		
 	}
 	else
 	{
