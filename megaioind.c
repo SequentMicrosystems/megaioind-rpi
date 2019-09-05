@@ -26,7 +26,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)5
+#define VERSION_MINOR	(int)6
 
 #define RTC_MIN_DAY		1
 #define RTC_MAX_DAY		31
@@ -44,7 +44,7 @@
 enum{
 	MB_TYPE_NONE = 0,
 	MB_TYPE_RTU,
-	MB_TYPE_ASCII
+	MB_TYPE_PASS_THRU
 };
 
 enum{
@@ -74,7 +74,7 @@ int extractInt(char* str, int pos, int len);
 int extractDate(char* str, RtcStructType* rtc);
 int extractTime(char* str, RtcStructType* rtc);
 
-const char* gMbType[3] = {"NONE", "RTU", "ASCII"};
+const char* gMbType[3] = {"NONE", "RTU", "PASS-THRU"};
 const char* gMbParity[3] = {"NONE", "ODD", "EVEN"};
 const char* gMbStopBits[3] = {"ONE", "TWO", "ONE_AND_HALF"};
 
@@ -814,7 +814,7 @@ static void doOptoInRead(int argc, char *argv[])
 	}
 	else
 	{
-		printf( "Usage: %s read opto pins \n", argv [0]) ;
+		printf("Invalid number of parameters type: megaioind -h ropto\n");
 		exit (1) ;
 	} 
 }
@@ -837,9 +837,7 @@ static void doOcOutWrite(int argc, char *argv[])
 
 	if ((argc != 5) && (argc != 4))
 	{
-		printf( "Usage: megaioind <id>  <oc number> <on/off> \n") ;
-		printf( "Usage: megaioind <id> ocwrocwriteite <oc reg value> \n") ;
-    
+		printf("Invalid number of parameters type: megaioind -h woc\n");
 		exit (1) ;
 	}
   
@@ -971,7 +969,7 @@ static void doOcOutRead(int argc, char *argv[])
   }
   else
   {
-    printf( "Usage: %s read Open collector output value\n", argv [0]) ;
+    printf("Invalid number of parameters type: megaioind -h roc\n");
     exit (1) ;
   }
   
@@ -1008,6 +1006,92 @@ static void doTimeGet(int argc, char *argv[])
   }
 	
 }
+
+static void doModbusCfgGet(int argc, char* argv[])
+{
+  int dev = 0;
+  int bType = 0;
+  int ret = 0;
+  uint8_t buff[4];
+  ModbusSetingsType modbus;
+  
+  UNUSED(argv); 
+  if(argc != 3)
+  {
+    printf("Invalid number of parameters type: megaioind -h rcfgmb\n");
+    exit(1);
+  }
+  
+	dev = doBoardInit (gHwAdd, &bType);
+	if(dev <= 0)
+	{  
+		exit(1);
+	}
+
+  ret = readBuff(dev, buff, MODBUS_SETINGS_ADD , 4);
+  if(ret < 1)
+  {
+    printf("Fail to read modbus settings!\n");
+    exit(1);
+  }
+  memcpy(&modbus, buff, 4);
+  
+  printf("modbus %d %d %d %d\n", modbus.mbType, modbus.mbBaud, modbus.mbParity, modbus.mbStopB);
+  //verbose
+  printf("modbus type:%s baud:%d parity:%s stopBits:%s\n", gMbType[modbus.mbType], modbus.mbBaud, gMbParity[modbus.mbParity], gMbStopBits[modbus.mbStopB]);
+}
+
+static void doModbusCfgSet(int argc, char* argv[])
+{
+  int dev = 0;
+  int bType = 0;
+  int ret = 0;
+  unsigned char buff[4];
+  ModbusSetingsType modbus;
+   
+  if(argc != 7)
+  {
+    printf("Invalid number of parameters type: megaioind -h wcfgmb\n");
+    exit(1);
+  }
+  
+	dev = doBoardInit (gHwAdd, &bType);
+	if(dev <= 0)
+	{  
+		exit(1);
+	} 
+  modbus.mbType = atoi(argv[3]);
+  if(modbus.mbType < 0 || modbus.mbType > 1)
+  {
+    printf("Wrong type (0- disable; 1 - RTU;)\n");
+    exit(1);
+  }
+  modbus.mbBaud = atoi(argv[4]);
+  if(modbus.mbBaud < 1200 || modbus.mbBaud > 115200)
+  {
+    printf("Wrong baudrate, set to 9600\n");
+    modbus.mbBaud = 9600;
+  }
+  modbus.mbParity = atoi(argv[5]);
+  if(modbus.mbParity < 0 || modbus.mbParity > 2)
+  {
+    printf("Wrong parity, set to none\n");
+    modbus.mbParity = 0;
+  }
+  modbus.mbStopB = atoi(argv[6]);
+  if( modbus.mbStopB < 0 || modbus.mbStopB > 2)
+  {
+    printf("Wrong stop bits, set to one\n");
+    modbus.mbStopB = 0;
+  }
+  memcpy(buff, &modbus, sizeof(buff));
+  ret = writeBuff(dev, buff, MODBUS_SETINGS_ADD , 4);
+  if(ret < 1)
+  {
+    printf("Fail!\n");
+  }
+}
+
 
 static void doTimeSet(int argc, char *argv[])
 {
@@ -1075,6 +1159,8 @@ static void doTimeSet(int argc, char *argv[])
 		"         megaioind <id> woc <val>\n"
     "         megaioind <id> time\n"
     "         megaioind <id> stime <dd/mm/yyyy> <hh:mm:ss>\n"
+    "         megaioind <id> wcfgmb <type> <baud> <parity> <stopBits>\n"
+    "         megaioind <id> rcfgmb\n"
 		"Where: <id> = Board level id = 0..3\n"
 		"Type megaioind -h <command> for more help";// No trailing newline needed here.
    
@@ -1175,6 +1261,22 @@ void doHelp(int argc, char *argv[])
 			printf("\ttime:        Set the time and date\n");
 			printf("\tUsage:       megaioind <id> stime <mm/dd/yyyy> <hh:mm:ss>\n");
 			printf("\tExample:     megaioind 0 stime 05/03/2018 01:09:14\n");
+		}
+    else if(strcasecmp(argv[2], "wcfgmb") == 0)
+		{
+			printf("\twcfgmb:      Configure modbus communication\n");
+			printf("\tUsage:       megaioind <id> wcfgmb <type> <baud> <parity> <stopBits>\n");
+      printf("\t\ttype:    \t0 - disable 485 communication\n\t\t\t\t1-enable modbus RTU slave\n\t\t\t\t2 - 485 passthru(future)\n");
+      printf("\t\tbaud:    \t1200 - 115200\n");
+      printf("\t\tparity:  \t0 - none, 1 - odd, 2 - even\n");
+      printf("\t\tstopBits:\t0 - 1bit, 1 - 2bits, 2 - 1.5bits\n");
+			printf("\tExample:     megaioind 0 wcfgmb 1 9600 0 0\n");
+		}
+    else if(strcasecmp(argv[2], "rcfgmb") == 0)
+		{
+			printf("\trcfgmb:      Get modbus communication configuration\n");
+			printf("\tUsage:       megaioind <id> rcfgmb \n");
+			printf("\tExample:     megaioind 0 rcfgmb \n");
 		}
 		else
 		{
@@ -1307,21 +1409,23 @@ int main(int argc, char *argv [])
   gHwAdd = MEGAIO_HW_I2C_BASE_ADD + id;
   
   
-  /**/ if (strcasecmp (argv [2], "wrelay"  ) == 0)	{ doRelayWrite     (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "rrelay"  ) == 0)	{ doRelayRead      (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "riin"    ) == 0)	{ do420InRead      (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "riout"   ) == 0)	{ do420OutRead     (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "wiout"   ) == 0)	{ do420OutWrite    (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "ruin"    ) == 0)	{ do010InRead      (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "ruout"   ) == 0)	{ do010OutRead     (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "wuout"   ) == 0)	{ do010OutWrite    (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "rresin"  ) == 0)	{ doResInRead	   (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "ropto"   ) == 0)	{ doOptoInRead     (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "board"   ) == 0)	{ doBoard          (argc) 		;	return 0 ; } 
-  else if (strcasecmp (argv [2], "time"    ) == 0)	{ doTimeGet        (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "stime"    ) == 0)	{ doTimeSet        (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "woc"     ) == 0)	{ doOcOutWrite     (argc, argv) ;	return 0 ; }
-  else if (strcasecmp (argv [2], "roc"     ) == 0)	{ doOcOutRead      (argc, argv) ;	return 0 ; }
+  /**/ if (strcasecmp (argv [2], "wrelay"  ) == 0)	{ doRelayWrite     (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "rrelay"  ) == 0)	{ doRelayRead      (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "riin"    ) == 0)	{ do420InRead      (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "riout"   ) == 0)	{ do420OutRead     (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "wiout"   ) == 0)	{ do420OutWrite    (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "ruin"    ) == 0)	{ do010InRead      (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "ruout"   ) == 0)	{ do010OutRead     (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "wuout"   ) == 0)	{ do010OutWrite    (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "rresin"  ) == 0)	{ doResInRead	     (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "ropto"   ) == 0)	{ doOptoInRead     (argc, argv) ;	return 0 ;}
+  else if (strcasecmp (argv [2], "board"   ) == 0)	{ doBoard          (argc) 		;	return 0 ;} 
+  else if (strcasecmp (argv [2], "time"    ) == 0)	{ doTimeGet        (argc, argv) ;	return 0;}
+  else if (strcasecmp (argv [2], "stime"   ) == 0)	{ doTimeSet        (argc, argv) ;	return 0;}
+  else if (strcasecmp (argv [2], "woc"     ) == 0)	{ doOcOutWrite     (argc, argv) ;	return 0;}
+  else if (strcasecmp (argv [2], "roc"     ) == 0)	{ doOcOutRead      (argc, argv) ;	return 0;}
+  else if (strcasecmp (argv [2], "wcfgmb"  ) == 0)  { doModbusCfgSet   (argc, argv) ; return 0;}
+  else if (strcasecmp (argv [2], "rcfgmb"  ) == 0)  { doModbusCfgGet   (argc, argv) ; return 0;}
   else 
     printf("Invalid argument \n");
   return 0;
