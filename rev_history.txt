@@ -13,4 +13,7 @@ Version 1.1.0:
    Check board type    
    Display connectors sygnals 
 Version 1.1.3:
-   Add suport for rtc read and set   
+   Add suport for rtc read and set  
+Version 1.1.5:
+   Solve board dependent commands bug.
+   Some data type conflicts 

@@ -26,7 +26,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)4
+#define VERSION_MINOR	(int)5
 
 #define RTC_MIN_DAY		1
 #define RTC_MAX_DAY		31
