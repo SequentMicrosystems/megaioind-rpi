@@ -1,9 +1,9 @@
 
 [![megaioind-rpi](res/sequent.jpg)](https://www.sequentmicrosystems.com/megaio-ind.html)
 
-# megaioind.py
+# megaioind
 
-This is the python library to control [MegaIO Industrial Expansion Card For Raspberry Pi ](https://www.sequentmicrosystems.com/megaio-ind.html)
+This is the python library to control the [Industrial](https://www.sequentmicrosystems.com/megaio-ind.html) and [Building](https://www.sequentmicrosystems.com/megaio-bas.html) Automation I/O Expansion cards for Raspberry Pi.
 
 ## Install
 
