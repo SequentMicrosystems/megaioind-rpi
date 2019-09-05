@@ -199,7 +199,7 @@ char *basConnStr = 	"-----------------------------------------------------------
 
 void printbits(int v) 
 {
-	int i; // for C89 compatibility
+	int i = 0; // for C89 compatibility
 	
 	for(i = 17; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
@@ -274,7 +274,7 @@ int extractTime(char* str, RtcStructType* rtc)
 // set ON/OFF specify relay channel
 int relayChSet(int dev, u8 channel, OutStateEnumType state)
 {
-	int resp;
+	int resp = 0;
 	
 	if((channel < CHANNEL_NR_MIN) || (channel > RELAY_CH_NR_MAX))
 	{
@@ -310,7 +310,13 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 */
 static void doRelayWrite(int argc, char *argv[])
 {
-	int pin, val, dev, valR, valRmask, retry, bType;
+	int pin = 0;
+  int val = 0;
+  int dev = 0;
+  int valR = 0;
+  int valRmask = 0;
+  int retry = 0;
+  int bType = 0;
 
 	if ((argc != 5) && (argc != 4))
 	{
@@ -329,7 +335,8 @@ static void doRelayWrite(int argc, char *argv[])
 		pin = atoi (argv [3]) ;
 		if((pin < CHANNEL_NR_MIN) || (pin > RELAY_CH_NR_MAX))
 		{
-			printf( "Relay number value out of range\n");
+			printf( "0-10V Input channel number %d out of range, valid [%d, %d]\n", pin, 
+            CHANNEL_NR_MIN, V_IN_CH_MAX);
 			exit(1);
 		}
 
@@ -398,7 +405,10 @@ static void doRelayWrite(int argc, char *argv[])
 */
 static void doRelayRead(int argc, char *argv[])
 {
-	int pin, val, dev, bType;
+	int pin = 0;
+  int val = 0;
+  int dev = 0;
+  int bType = 0;
 
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -409,7 +419,7 @@ static void doRelayRead(int argc, char *argv[])
 	if (argc == 4)
 	{
 		pin = atoi (argv [3]) ;
-		if((pin < 1) || (pin > 8))
+		if((pin < CHANNEL_NR_MIN) || (pin > RELAY_CH_NR_MAX))
 		{
 			printf( "Relay number value out of range\n");
 			exit(1);
@@ -456,8 +466,11 @@ static void doRelayRead(int argc, char *argv[])
 */
 static void do420InRead(int argc, char *argv[])
 {
-	int pin, dev, rd, bType;
- float val;
+	int pin = 0;
+  int dev = 0;
+  short int rd = 0;
+  int bType = 0;
+  float val = 0;
 
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -466,7 +479,7 @@ static void do420InRead(int argc, char *argv[])
 	}
 	if(bType != BOARD_TYPE_IND)
 	{
-		printf("Valid for Industrial board type only!");
+		printf("Valid for Industrial board type only!\n");
 		exit(1);
 	}
 	if (argc == 4)
@@ -495,8 +508,11 @@ static void do420InRead(int argc, char *argv[])
 */
 static void do420OutRead(int argc, char *argv[])
 {
-	int pin, dev, rd, bType;
-	float val;
+  int dev = 0;
+  int bType = 0;
+	int pin = 0;
+  short int rd = 0;
+	float val = 0;
 
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -505,7 +521,7 @@ static void do420OutRead(int argc, char *argv[])
 	}
 	if(bType != BOARD_TYPE_IND)
 	{
-		printf("Valid for Industrial board type only!");
+		printf("Valid for Industrial board type only!\n");
 		exit(1);
 	}
 	if (argc == 4)
@@ -535,9 +551,12 @@ static void do420OutRead(int argc, char *argv[])
 
 static void do420OutWrite(int argc, char *argv[])
 {
-  int dev, rawVal, pin, bType;
-  float val;
-  int ret;
+  int dev = 0;
+  short int rawVal = 0;
+  int pin= 0;
+  int bType = 0;
+  float val = 0;
+  int ret = 0;
 	
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -546,7 +565,7 @@ static void do420OutWrite(int argc, char *argv[])
 	}
 	if(bType != BOARD_TYPE_IND)
 	{
-		printf("Valid for Industrial board type only!");
+		printf("Valid for Industrial board type only!\n");
 		exit(1);
 	}
 	if (argc != 5)
@@ -571,7 +590,6 @@ static void do420OutWrite(int argc, char *argv[])
 	if(ret == ERROR)
 	{
 		printf("Fail to write err: %d\n", ret);
-   
 		exit(1);
 	}
 }
@@ -584,17 +602,15 @@ static void do420OutWrite(int argc, char *argv[])
 */
 static void do010InRead(int argc, char *argv[])
 {
-	int pin, dev, rd, bType;
- float val;
+  int dev = 0;
+  int bType = 0;
+	int pin = 0;
+  short int rd = 0;
+  float val = 0;
 
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
 	{		 
-		exit(1);
-	}
-	if(bType != BOARD_TYPE_IND)
-	{
-		printf("Valid for Industrial board type only!");
 		exit(1);
 	}
 	if (argc == 4)
@@ -602,7 +618,8 @@ static void do010InRead(int argc, char *argv[])
 		pin = atoi (argv [3]) ;
 		if((pin < CHANNEL_NR_MIN) || (pin > V_IN_CH_MAX))
 		{
-			printf( "0-10V Input channel number %d out of range\n", pin);
+			printf( "0-10V Input channel number %d out of range, valid [%d, %d]\n", pin, 
+            CHANNEL_NR_MIN, V_IN_CH_MAX);
 			exit(1);
 		}
 		rd = readReg16(dev, U0_10_IN_VAL1_ADD + 2*( pin -1));
@@ -623,8 +640,12 @@ static void do010InRead(int argc, char *argv[])
 */
 static void do010OutRead(int argc, char *argv[])
 {
-	int pin, dev, rd, bType, maxCh = V_OUT_CH_MAX;
-	float val;
+	int pin = 0;
+  int dev = 0;
+  short int rd = 0;
+  int bType = 0;
+  int maxCh = V_OUT_CH_MAX;
+	float val = 0;
 
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -661,9 +682,13 @@ static void do010OutRead(int argc, char *argv[])
 */
 static void do010OutWrite(int argc, char *argv[])
 {
-  int dev, rawVal, pin, bType, maxCh = V_OUT_CH_MAX;
-  float val;
-  int ret;
+  int dev = 0;
+  short int rawVal = 0;
+  int pin = 0;
+  int bType = 0;
+  int maxCh = V_OUT_CH_MAX;
+  float val = 0;
+  int ret = 0;
 	
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -708,7 +733,10 @@ static void do010OutWrite(int argc, char *argv[])
 
 static void doResInRead(int argc, char *argv[])
 {
-	int dev, rawVal, pin, bType;
+	int dev = 0;
+  short int rawVal = 0;
+  int pin = 0;
+  int bType = 0;
 	
 	dev = doBoardInit (gHwAdd, &bType);
 	if(dev <= 0)
@@ -717,7 +745,7 @@ static void doResInRead(int argc, char *argv[])
 	}
 	if(bType != BOARD_TYPE_BAS)
 	{
-		printf("Valid for Building Automation board type only!");
+		printf("Valid for Building Automation board type only!\n");
 		exit(1);
 	}
 	if (argc == 4)
@@ -748,7 +776,10 @@ static void doResInRead(int argc, char *argv[])
 
 static void doOptoInRead(int argc, char *argv[])
 {
-  int pin, val, dev, bType;
+  int pin = 0;
+  int val = 0;
+  int dev = 0;
+  int bType = 0;
 
 	dev = doBoardInit(gHwAdd, &bType);
 	if(dev <= 0)
@@ -796,7 +827,13 @@ static void doOptoInRead(int argc, char *argv[])
 
 static void doOcOutWrite(int argc, char *argv[])
 {
-	int pin, val, dev, valR, valRmask, retry, bType;
+	int pin = 0;
+  int val = 0;
+  int dev = 0;
+  int valR = 0;
+  int valRmask = 0;
+  int retry = RETRY_TIMES;
+  int bType = 0;
 
 	if ((argc != 5) && (argc != 4))
 	{
@@ -896,12 +933,14 @@ static void doOcOutWrite(int argc, char *argv[])
 */
 static void doOcOutRead(int argc, char *argv[])
 {
-  int pin, val, dev, bType;
+  int pin = 0;
+  int val = 0;
+  int dev = 0;
+  int bType = 0;
 
   dev = doBoardInit (gHwAdd, &bType);
   if(dev <= 0)
-  {
-     
+  {     
     exit(1);
   }
   
@@ -940,7 +979,9 @@ static void doOcOutRead(int argc, char *argv[])
 
 static void doTimeGet(int argc, char *argv[])
 {
-	int dev, bType, ret;
+	int dev = 0;
+  int bType = 0;
+  int ret = 0;
 	RtcStructType rtc;
   
   UNUSED(argv);
@@ -970,7 +1011,9 @@ static void doTimeGet(int argc, char *argv[])
 
 static void doTimeSet(int argc, char *argv[])
 {
-	int dev, bType, ret;
+	int dev = 0;
+  int bType = 0;
+  int ret = 0;
 	RtcStructType rtc;
   
   if(argc != 5)
@@ -1147,10 +1190,15 @@ void doHelp(int argc, char *argv[])
 		
 void doBoard(int argc)
 {
-	int dev, hwMajor, hwMinor, minor , major;
+	int dev = 0;
+  int hwMajor = 0;
+  int hwMinor = 0;
+  int minor = 0;
+  int major = 0;
 	int bType = 0;
-	int val;
-	float vIn, vRasp;
+	int val = 0;
+	float vIn = 0;
+  float vRasp = 0;
 	
 	
 	if(argc == 3)
@@ -1209,7 +1257,7 @@ static void doVersion(void)
 */
 int main(int argc, char *argv [])
 {
-  int id;
+  int id = 0;
   
   if (argc == 1)
   {
