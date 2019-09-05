@@ -149,3 +149,19 @@ Get the previously set state of all open-collector output pins
 stack - stack level of the megaIO Industrial card (selectable from address jumpers [0..3])
 
 return - state of pins ( ex: 0: all pins OFF, 15: all pins ON, 1:  pin #1 ON, all the rest: OFF)
+
+
+### getInVolt(stack)
+Get the power supply voltage
+
+stack - stack level of the megaIO Industrial card (selectable from address jumpers [0..3])
+
+return - the power supply in Volts
+
+
+### getRaspVolt(stack)
+Get the raspberry power supply voltage (5V)
+
+stack - stack level of the megaIO Industrial card (selectable from address jumpers [0..3])
+
+return - the Raspberry pi power supply in Volts
