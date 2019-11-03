@@ -173,7 +173,7 @@ def getRInK(stack, ch):
 		raise ValueError('Invalid stack level')
 		return -1 
   val = bus.read_word_data(HW_ADD + stack, R_10K_CH1 + (2 * (ch - 1)))
-  return(c2(val)/1000.0) 	
+  return(val/1000.0) 	
   
 def getRIn(stack, ch):
   if ch < 1 or ch > 4:
@@ -183,7 +183,7 @@ def getRIn(stack, ch):
 		raise ValueError('Invalid stack level')
 		return -1
   val = bus.read_word_data(HW_ADD + stack, R_10K_CH1 + (2 * (ch - 1)))
-  return(c2(val)) 	  
+  return(val) 	  
 
 def getRelays(stack):
   if stack < 0 or stack > 3:
