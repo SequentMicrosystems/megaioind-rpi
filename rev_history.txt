@@ -19,3 +19,5 @@ Version 1.1.5:
    Some data type conflicts 
 Version 1.1.6:
    Add support for MODBUS settings   "rcfgmb"/"wcfgmb"
+Version 1.2.0:
+   Add suport for calibration of 4-20mA IN/OUT, 0-10V IN/OUT, Resistance IN channels
