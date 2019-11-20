@@ -106,9 +106,50 @@ enum
 
 };
 
+enum CAL_CH
+{
+	CAL_NONE = 0,
+	CAL_I4_20_OUT_CH1,
+	CAL_I4_20_OUT_CH2,
+	CAL_I4_20_OUT_CH3,
+	CAL_I4_20_OUT_CH4,
+	CAL_I4_20_IN_CH1,
+	CAL_I4_20_IN_CH2,
+	CAL_I4_20_IN_CH3,
+	CAL_I4_20_IN_CH4,
+
+	CAL_U0_10_OUT_CH1,
+	CAL_U0_10_OUT_CH2,
+	CAL_U0_10_OUT_CH3,
+	CAL_U0_10_OUT_CH4,
+	CAL_U0_10_IN_CH1,
+	CAL_U0_10_IN_CH2,
+	CAL_U0_10_IN_CH3,
+	CAL_U0_10_IN_CH4,
+	CAL_U0_10_OUT_CH5,
+	CAL_U0_10_OUT_CH6,
+	CAL_U0_10_OUT_CH7,
+	CAL_U0_10_OUT_CH8,
+
+	CAL_R_IN_CH1,
+	CAL_R_IN_CH2,
+	CAL_R_IN_CH3,
+	CAL_R_IN_CH4,
+	CAL_CH_COUNT,
+
+	CAL_RESET_I4_20_OUT = 100,
+	CAL_RESET_I4_20_IN,
+	CAL_RESET_U0_10V_IN,
+	CAL_RESET_U0_10V_OUT,
+	CAL_RESET_R_IN,
+
+};
+
 #define SET_TIME_KEY	0xA5
 #define GPIO_PIN_NUMBER					(u8)6
 
+#define CMD_START_CALIBRATION		0x01
+#define CALIB_RESET_KEY_VAL			0xbaba
 
 #define ERROR	-1
 #define FAIL	0
@@ -180,6 +221,15 @@ __attribute__((packed))
 		u8 min;
 		u8 s;
 	} RtcStructType;
+	
+typedef struct
+	__attribute__((packed))
+	{
+		unsigned int mbBaud :26;
+		unsigned int mbType :2;
+		unsigned int mbParity :2;
+		unsigned int mbStopB :2;
+	} ModbusSetingsType;	
 	
 void startThread(void);
 int checkThreadResult(void);
