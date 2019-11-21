@@ -28,7 +28,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)2
-#define VERSION_MINOR	(int)0
+#define VERSION_MINOR	(int)1
 
 #define RTC_MIN_DAY		1
 #define RTC_MAX_DAY		31
@@ -1665,28 +1665,28 @@ static void doTimeSet(int argc, char *argv[])
 char *usage = "Usage:	 megaioind -h <command>\n"
 		"         megaioind -v\n"
 		"         megaioind -warranty\n"
-		"         megaioind <id> board\n"
-		"         megaioind <id> wrelay <channel> <on/off>\n"
-		"         megaioind <id> rrelay <channel>\n"
+		"         megaioind <id> Board\n"
+		"         megaioind <id> wrelay <Channel> <on/off>\n"
+		"         megaioind <id> rrelay <Channel>\n"
 		"         megaioind <id> rrelay\n"
-		"         megaioind <id> riin <channel>\n"
-		"         megaioind <id> ciin <channel> <value>\n"
+		"         megaioind <id> riin <Channel>\n"
+		"         megaioind <id> ciin <Channel> <value>\n"
 		"         megaioind <id> rciin\n"
-		"         megaioind <id> riout <channel>\n"
-		"         megaioind <id> ciout <channel> <value>\n"
+		"         megaioind <id> riout <Channel>\n"
+		"         megaioind <id> ciout <Channel> <value>\n"
 		"         megaioind <id> rciout\n"
-		"         megaioind <id> wiout <channel> <value>\n"
-		"         megaioind <id> ruin <channel>\n"
-		"         megaioind <id> cuin <channel> <value>\n"
+		"         megaioind <id> wiout <Channel> <value>\n"
+		"         megaioind <id> ruin <Channel>\n"
+		"         megaioind <id> cuin <Channel> <value>\n"
 		"         megaioind <id> rcuin\n"
-		"         megaioind <id> ruout <channel>\n"
-		"         megaioind <id> cuout <channel> <value>\n"
+		"         megaioind <id> ruout <Channel>\n"
+		"         megaioind <id> cuout <Channel> <value>\n"
 		"         megaioind <id> rcuout\n"
-		"         megaioind <id> wuout <channel> <value>\n"
-		"         megaioind <id> rresin <channel>\n"
-		"         megaioind <id> cresin <channel> <value>\n"
+		"         megaioind <id> wuout <Channel> <value>\n"
+		"         megaioind <id> rresin <Channel>\n"
+		"         megaioind <id> cresin <Channel> <value>\n"
 		"         megaioind <id> rcresin\n"
-		"         megaioind <id> ropto <channel>\n"
+		"         megaioind <id> ropto <Channel>\n"
 		"         megaioind <id> ropto\n"
 		"         megaioind <id> roc\n"
 		"         megaioind <id> woc <ch> <on/off; 1/0>\n"
@@ -1704,172 +1704,174 @@ void doHelp(int argc, char *argv[])
 	{
 		/**/if (strcasecmp(argv[2], "wrelay") == 0)
 		{
-			printf("\twrelay:      Set Relay On/Off\n");
-			printf("\tUsage:       megaioind <id> wrelay <channel> <on/off>\n");
-			printf("\tExample:     megaioind 0 wrelay 2 On; Set Relay #2 on Board #0 On\n");
+			printf("\twrelay:     Set Relay On/Off\n");
+			printf("\tUsage:      megaioind <id> wrelay <Channel> <on/off>\n");
+			printf(
+					"\tExample:     megaioind 0 wrelay 2 On; Set Relay #2 on Board #0 On\n");
 		}
-		else if (strcasecmp(argv[2], "board") == 0)
+		else if (strcasecmp(argv[2], "Board") == 0)
 		{
-			printf("\tboard:       Show Hardware and Software Version, I/O Pinout & Voltages\n");
-			printf("\tUsage:       megaioind <id> board\n");
-			printf("\tExample:     megaioind 0 board\n");
+			printf("\tBoard:      Show Hardware and Software Version, I/O Pinout & Voltages\n");
+			printf("\tUsage:      megaioind <id> Board\n");
+			printf("\tExample:    megaioind 0 Board\n");
 		}
 		else if (strcasecmp(argv[2], "rrelay") == 0)
 		{
-			printf("\trrelay:      Read Relay Status\n");
-			printf("\tUsage:       megaioind <id> rrelay <channel>\n");
-			printf("\tUsage:       megaioind <id> rrelay\n");
-			printf("\tExample:     megaioind 0 rrelay 2; Read Status of Relay #2 on Board #0\n");
+			printf("\trrelay:     Read Relay Status\n");
+			printf("\tUsage:      megaioind <id> rrelay <Channel>\n");
+			printf("\tUsage:      megaioind <id> rrelay\n");
+			printf("\tExample:    megaioind 0 rrelay 2; Read Status of Relay #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "riin") == 0)
 		{
-			printf("\triin:        Read 4 - 20 mA Input\n");
-			printf("\tUsage:       megaioind <id> riin <channel>\n");
-			printf("\tExample:     megaioind 0 riin 2; Read Value of 4 -20mA input channel #2 on Board #0\n");
+			printf("\triin:       Read 4-20mA Input\n");
+			printf("\tUsage:      megaioind <id> riin <Channel>\n");
+			printf("\tExample:    megaioind 0 riin 2; Read Value of 4-20mA Input Channel #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "ciin") == 0)
 		{
-			printf("\tciin:       Calibrate 4 - 20 mA Input channel\n");
-			printf("\tUsage:      megaioind <id> ciin <channel> <value>\n");
-			printf("\tExample:    megaioind 0 ciin 2 5.35; Calibrate  4 -20mA input channel #2 at 5.35mA on Board #0\n");
-			printf("\tComment:    For complete process make 2 points calibration, one close to 4mA and one close to 20mA\n");
+			printf("\tciin:       Calibrate 4-20mA Input Channel\n");
+			printf("\tUsage:      megaioind <id> ciin <Channel> <value>\n");
+			printf("\tExample:    megaioind 0 ciin 2 5.35; Calibrate  4-20mA Input Channel #2 at 5.35mA on Board #0\n");
+			printf("\tComment:    Two points calibration required: first close to 4mA and second close to 20mA\n");
 		}
 		else if (strcasecmp(argv[2], "rciin") == 0)
 		{
-			printf("\trciin:      Reset calibration for all 4 - 20 mA Input channels\n");
+			printf("\trciin:      Reset Calibration of 4-20mA Input Channels\n");
 			printf("\tUsage:      megaioind <id> rciin\n");
 			printf("\tExample:    megaioind 0 rciin\n");
-			printf("\tComment:    After isue this command you need to calibrate all 4 - 20mA in channels!\n");
+			printf("\tComment:    After issuing this command you must calibrate all 4-20mA Input Channels\n");
 		}
 		else if (strcasecmp(argv[2], "riout") == 0)
 		{
-			printf("\triout:       Read 4 - 20 mA Output\n");
-			printf("\tUsage:       megaioind <id> riout <channel>\n");
-			printf("\tExample:     megaioind 0 riout 2; Read Value of 4 -20mA output channel #2 on Board #0\n");
+			printf("\triout:      Read 4-20mA Output\n");
+			printf("\tUsage:      megaioind <id> riout <Channel>\n");
+			printf("\tExample:    megaioind 0 riout 2; Read Value of 4-20mA Output Channel #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "ciout") == 0)
 		{
-			printf("\tciout:       Calibrate 4 - 20 mA Output\n");
-			printf("\tUsage:       megaioind <id> ciout <channel> <value>\n");
-			printf("\tExample:     megaioind 0 ciout 2 5.35; Calibrate  4 -20mA output channel #2 at 5.35mA on Board #0\n");
-			printf("\tComment:     For complete process make 2 points calibration, one close to 4mA and one close to 20mA\n");
+			printf("\tciout:      Calibrate 4-20mA Output\n");
+			printf("\tUsage:      megaioind <id> ciout <Channel> <value>\n");
+			printf("\tExample:    megaioind 0 ciout 2 5.35; Calibrate  4-20mA Output Channel #2 at 5.35mA on Board #0\n");
+			printf("\tComment:    Two points calibration required: first close to 4mA and second close to 20mA\n");
 		}
 		else if (strcasecmp(argv[2], "rciout") == 0)
 		{
-			printf("\trciout:     Reset calibration for all 4 - 20 mA Output channels\n");
+			printf("\trciout:     Reset Calibration of 4-20mA Output Channels\n");
 			printf("\tUsage:      megaioind <id> rciout\n");
 			printf("\tExample:    megaioind 0 rciout\n");
-			printf("\tComment:    After isue this command you need to calibrate all 4 - 20mA output channels!\n");
+			printf("\tComment:    After issuing this command you must calibrate all 4-20mA in Channels\n");
 		}
 		else if (strcasecmp(argv[2], "wiout") == 0)
 		{
-			printf("\twiout:       Write 4 - 20mA Output\n");
-			printf("\tUsage:       megaioind <id> wiout <value>\n");
-			printf("\tExample:     megaioind 0 wiout 1 5.33; Set 5.33 mA on output channel 1\n");
+			printf("\twiout:      Write 4-20mA Output\n");
+			printf("\tUsage:      megaioind <id> wiout <value>\n");
+			printf("\tExample:    megaioind 0 wiout 1 5.33; Set 5.33 mA on Output Channel 1\n");
 		}
 		else if (strcasecmp(argv[2], "ruin") == 0)
 		{
-			printf("\truin:        Read 0 - 10V Input\n");
-			printf("\tUsage:       megaioind <id> ruin <channel>\n");
-			printf("\tExample:     megaioind 0 ruin 2; Read Value of 0 - 10V input channel #2 on Board #0\n");
+			printf("\truin:       Read 0-10V Input\n");
+			printf("\tUsage:      megaioind <id> ruin <Channel>\n");
+			printf("\tExample:    megaioind 0 ruin 2; Read value of 0-10V Input Channel #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "cuin") == 0)
 		{
-			printf("\tcuin:        Calibrate 0 - 10V Input channel\n");
-			printf("\tUsage:       megaioind <id> cuin <channel> <value>\n");
-			printf("\tExample:     megaioind 0 cuin 1 9.12; Calibrate  0-10V input channel #1 at 9.12V on Board #0\n");
-			printf("\tComment:     For complete process make 2 points calibration, one close to 0V and one close to 10V\n");
+			printf("\tcuin:       Calibrate 0-10V Input Channel\n");
+			printf("\tUsage:      megaioind <id> cuin <Channel> <value>\n");
+			printf("\tExample:    megaioind 0 cuin 1 9.12; Calibrate  0-10V Input Channel #1 at 9.12V on Board #0\n");
+			printf("\tComment:    Two points calibration required: first close to 0V and second close to 10V\n");
 		}
 		else if (strcasecmp(argv[2], "rcuin") == 0)
 		{
-			printf("\trcuin:      Reset calibration for all 0 - 10 V Input channels\n");
+			printf("\trcuin:      Reset Calibration for all 0-10V Input Channels\n");
 			printf("\tUsage:      megaioind <id> rcuin\n");
 			printf("\tExample:    megaioind 0 rcuin\n");
-			printf("\tComment:    After isue this command you need to calibrate all 0 - 10 V Input channels!\n");
+			printf("\tComment:    After issuing this command you must calibrate all 0-10V Input Channels\n");
+
 		}
 		else if (strcasecmp(argv[2], "ruout") == 0)
 		{
-			printf("\truout:       Read 0 - 10V Output\n");
-			printf("\tUsage:       megaioind <id> ruout <channel>\n");
-			printf("\tExample:     megaioind 0 ruout 2; Read Value of 0 - 10V output channel #2 on Board #0\n");
+			printf("\truout:      Read 0-10V Output\n");
+			printf("\tUsage:      megaioind <id> ruout <Channel>\n");
+			printf("\tExample:    megaioind 0 ruout 2; Read Value of 0-10V Output Channel #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "cuout") == 0)
 		{
-			printf("\tcuout:       Calibrate 0 - 10V Output channel\n");
-			printf("\tUsage:       megaioind <id> cuout <channel> <value>\n");
-			printf("\tExample:     megaioind 0 cuout 1 9.12; Calibrate  0-10V output channel #1 at 9.12V on Board #0\n");
-			printf("\tComment: 	   For complete process make 2 points calibration, one close to 0V and one close to 10V\n");
+			printf("\tcuout:      Calibrate 0-10V Output Channel\n");
+			printf("\tUsage:      megaioind <id> cuout <Channel> <value>\n");
+			printf("\tExample:    megaioind 0 cuout 1 9.12; Calibrate  0-10V Output Channel #1 at 9.12V on Board #0\n");
+			printf("\tComment:    Two points calibration required: first close to 0V and second close to 10V\n");
 		}
 		else if (strcasecmp(argv[2], "rcuout") == 0)
 		{
-			printf("\trcuout:     Reset calibration for all 0 - 10 V Output channels\n");
+			printf("\trcuout:     Reset calibration for all 0-10V Output Channels\n");
 			printf("\tUsage:      megaioind <id> rcuout\n");
 			printf("\tExample:    megaioind 0 rcuout\n");
-			printf("\tComment:    After isue this command you need to calibrate all 0 - 10 V Output channels!\n");
+			printf("\tComment:    After issuing this command you must calibrate all 0-10V Output Channels\n");
 		}
 		else if (strcasecmp(argv[2], "wuout") == 0)
 		{
-			printf("\twuout:       Write 0 - 10V Output\n");
-			printf("\tUsage:       megaioind <id> wuout <value>\n");
-			printf("\tExample:     megaioind 0 wuout 1 5.33; Set 5.33V on output channel 1\n");
+			printf("\twuout:      Write 0-10V Output\n");
+			printf("\tUsage:      megaioind <id> wuout <value>\n");
+			printf("\tExample:    megaioind 0 wuout 1 5.33; Set 5.33V on Output Channel 1\n");
 		}
 		else if (strcasecmp(argv[2], "rresin") == 0)
 		{
-			printf("\trresin:      Read resistance Input in ohm's( NTC 10K)- MegaIO-BAS only!\n");
-			printf("\tUsage:        megaioind <id> rresin <channel>\n");
-			printf("\tExample:     megaioind 0 rresin 2; Read Value of Resistance input channel #2 on Board #0\n");
+			printf("\trresin:     Read resistance Input in ohm's( NTC 10K\n");
+			printf("\tUsage:      megaioind <id> rresin <Channel>\n");
+			printf("\tExample:    megaioind 0 rresin 2; Read Value of Resistance Input Channel #2 on Board #0\n");
 		}
 		else if (strcasecmp(argv[2], "cresin") == 0)
 		{
-			printf("\tcresin:       Calibrate resistance Input channel\n");
-			printf("\tUsage:        megaioind <id> cresin <channel> <value>\n");
-			printf("\tExample:      megaioind 0 cresin 1 11000; Calibrate  Resistance input channel #1 at 11kOhms on Board #0\n");
-			printf("\tComment: 	    For complete process make 2 points calibration, one close to 10kOhms and one close to 20kOhms\n");
+			printf("\tcresin:     Calibrate 10K Input Channel\n");
+			printf("\tUsage:      megaioind <id> cresin <Channel> <value>\n");
+			printf("\tExample:    megaioind 0 cresin 1 11000; Calibrate  Resistance Input Channel #1 at 11kOhms on Board #0\n");
+			printf("\tComment:    Two points calibration required: first close to 10KOhms and second close to 20KOhms\n");
 		}
 		else if (strcasecmp(argv[2], "rcresin") == 0)
 		{
-			printf("\trcresin:    Reset calibration for all Resistance Input channels\n");
+			printf("\trcresin:    Reset calibration for all 10K Input Channels\n");
 			printf("\tUsage:      megaioind <id> rcresin\n");
 			printf("\tExample:    megaioind 0 rcresin\n");
-			printf("\tComment:    After isue this command you need to calibrate all Resistance Input channels!\n");
+			printf("\tComment:    After issuing this command you must calibrate all 10K Input Channels\n");
 		}
 		else if (strcasecmp(argv[2], "ropto") == 0)
 		{
-			printf("\toptread:     Read Optically Isolated Input bit or port\n");
-			printf("\tUsage:        megaioind <id> ropto (<channel>)\n");
-			printf("\tExample:     megaioind 0 ropto; Read all optically isolated inputs\n");
-			printf("\tExample:     megaioind 0 ropto 3; Read optically isolated input #3\n");
+			printf("\toptread:    Read Optically Isolated Input bit or port\n");
+			printf("\tUsage:      megaioind <id> ropto (<Channel>)\n");
+			printf("\tExample:    megaioind 0 ropto; Read all optically isolated Inputs\n");
+			printf("\tExample:    megaioind 0 ropto 3; Read optically isolated Input #3\n");
 		}
 		else if (strcasecmp(argv[2], "roc") == 0)
 		{
-			printf("\tocread:      Read the open-collector output's\n");
-			printf("\tUsage:       megaioind <id> roc\n");
-			printf("\tExample:     megaioond 0 roc\n");
+			printf("\tocread:     Read the open-collector Output's\n");
+			printf("\tUsage:      megaioind <id> roc\n");
+			printf("\tExample:    megaioond 0 roc\n");
 		}
 		else if (strcasecmp(argv[2], "woc") == 0)
 		{
-			printf("\tocwrite:     Write the open-collectot output's\n");
-			printf("\tUsage:       megaioind <id> woc <val>\n");
-			printf("\tExample:     megaioind 0 woc 5\n");
-			printf("\tUsage:       megaioind <id> woc <ch> <val>\n");
-			printf("\tExample:     megaioind 0 woc 2 on\n");
+			printf("\tocwrite:    Write the open-collectot Output's\n");
+			printf("\tUsage:      megaioind <id> woc <val>\n");
+			printf("\tExample:    megaioind 0 woc 5\n");
+			printf("\tUsage:      megaioind <id> woc <ch> <val>\n");
+			printf("\tExample:    megaioind 0 woc 2 on\n");
 		}
 		else if (strcasecmp(argv[2], "time") == 0)
 		{
-			printf("\ttime:        Display the board time and date (mm/dd/yyyy hh:mm:ss)\n");
-			printf("\tUsage:       megaioind <id> time\n");
-			printf("\tExample:     megaioind 0 time\n");
+			printf("\ttime:       Display the Board time and date (mm/dd/yyyy hh:mm:ss)\n");
+			printf("\tUsage:      megaioind <id> time\n");
+			printf("\tExample:    megaioind 0 time\n");
 		}
 		else if (strcasecmp(argv[2], "stime") == 0)
 		{
-			printf("\ttime:        Set the time and date\n");
-			printf("\tUsage:       megaioind <id> stime <mm/dd/yyyy> <hh:mm:ss>\n");
-			printf("\tExample:     megaioind 0 stime 05/03/2018 01:09:14\n");
+			printf("\ttime:       Set the time and date\n");
+			printf("\tUsage:      megaioind <id> stime <mm/dd/yyyy> <hh:mm:ss>\n");
+			printf("\tExample:    megaioind 0 stime 05/03/2018 01:09:14\n");
 		}
 		else if (strcasecmp(argv[2], "wcfgmb") == 0)
 		{
-			printf("\twcfgmb:      Configure modbus communication\n");
-			printf("\tUsage:       megaioind <id> wcfgmb <type> <baud> <parity> <stopBits>\n");
+			printf("\twcfgmb:     Configure modbus communication\n");
+			printf("\tUsage:      megaioind <id> wcfgmb <type> <baud> <parity> <stopBits>\n");
 			printf("\t\ttype:    \t0 - disable 485 communication\n\t\t\t\t1-enable modbus RTU slave\n\t\t\t\t2 - 485 passthru(future)\n");
 			printf("\t\tbaud:    \t1200 - 115200\n");
 			printf("\t\tparity:  \t0 - none, 1 - odd, 2 - even\n");
