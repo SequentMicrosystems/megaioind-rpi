@@ -133,6 +133,16 @@ stack - stack level of the megaIO Industrial card (selectable from address jumpe
 return - value of the inputs [0..255]
 
 
+### getOptoCh(stack, ch)
+Get the state of the opto-coupled input channel
+
+stack - stack level of the megaIO Industrial card (selectable from address jumpers [0..3])
+
+ch - selected channel number [1..4]
+
+return - value of the inputs [0/1]
+
+
 ### setOC(stack, pin, val)
 Set the state of the corresponding open-collector output pin
 

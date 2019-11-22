@@ -255,6 +255,19 @@ def getOpto(stack):
 		return -1 
 	val = bus.read_byte_data(HW_ADD + stack, OPTO_VAL_ADD)
 	return val
+ 
+def getOptoCh(stack, ch):
+  if ch < 1 or ch > 4:
+    raise ValueError("Channel out of range")
+    return -1
+  if stack < 0 or stack > 3:
+    raise ValueError('Invalid stack level')
+    return -1
+  val = bus.read_byte_data(HW_ADD + stack, OPTO_VAL_ADD)
+  mask = 1 << (ch - 1)
+  if val & mask :
+    return 1
+  return 0        
 
 def getModbus(stack):
 	if stack < 0 or stack > 3:
