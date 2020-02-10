@@ -1225,9 +1225,9 @@ static void doResInCalib(int argc, char *argv[])
 			exit(1);
 		}
 		val = atof(argv[4]);
-		if ((val < 0) || (val > 20))
+		if ((val < 0) || (val > 20000))
 		{
-			printf("Resistance Input calibration value out of range\n");
+			printf("Resistance Input calibration value out of range (0..20000)\n");
 			exit(1);
 		}
 		wr = (short int) val;
@@ -1824,9 +1824,9 @@ void doHelp(int argc, char *argv[])
 		else if (strcasecmp(argv[2], "cresin") == 0)
 		{
 			printf("\tcresin:     Calibrate 10K Input Channel\n");
-			printf("\tUsage:      megaioind <id> cresin <Channel> <value>\n");
+			printf("\tUsage:      megaioind <id> cresin <Channel> <value (in Ohms)>\n");
 			printf("\tExample:    megaioind 0 cresin 1 11000; Calibrate  Resistance Input Channel #1 at 11kOhms on Board #0\n");
-			printf("\tComment:    Two points calibration required: first close to 10KOhms and second close to 20KOhms\n");
+			printf("\tComment:    Two points calibration required: first close to 1K and less than 10KOhms and second close to and less than 20KOhms\n");
 		}
 		else if (strcasecmp(argv[2], "rcresin") == 0)
 		{
