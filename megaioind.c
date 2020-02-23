@@ -1864,7 +1864,7 @@ void doHelp(int argc, char *argv[])
 		}
 		else if (strcasecmp(argv[2], "stime") == 0)
 		{
-			printf("\ttime:       Set the time and date\n");
+			printf("\tstime:      Set the time and date\n");
 			printf("\tUsage:      megaioind <id> stime <mm/dd/yyyy> <hh:mm:ss>\n");
 			printf("\tExample:    megaioind 0 stime 05/03/2018 01:09:14\n");
 		}
