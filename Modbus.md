@@ -16,7 +16,7 @@ Set Modbus RTU , Baudrate: 9600bps, parity: None. 1 Stop Bit,
 display the full set of options
 
 ## Slave Address
-The slave address is set with the "stack level" jumpers, the jumpers configuration for stack level 0 (all jumpers removed) corespond to slave address 1.
+The slave address is set with the "stack level" jumpers. For example the jumpers configuration for stack level 0 (all jumpers removed) corespond to slave address 1.
 
 ## Modbus object types
 All modbus RTU object type with standard addresses are implemented : Coils, Discrete Inputs, Input registers, Holding registers.
