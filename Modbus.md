@@ -6,13 +6,13 @@ The [Industrial](https://www.sequentmicrosystems.com/megaio-ind.html) and [Build
 You can set-up the RS-485 port with **megaioind** command.
 
 Example:
-'''bash
+```bash
 ~$ megaioind 0 wcfgmb 1 9600 0 0
-'''
+```
 Set Modbus RTU , Baudrate: 9600bps, parity: None. 1 Stop Bit, 
-'''bash
+```bash
 ~$ megaioind -h wcfgmb
-'''
+```
 display the full set of options
 
 ## Slave Address
