@@ -1,5 +1,5 @@
 
-[![megaioind-rpi](readmeres/sequent.jpg)](https://www.sequentmicrosystems.com/megaio-ind.html)
+[![megaioind-rpi](readmeres/sequent.jpg)](https://sequentmicrosystems.com/index.php?route=product/category&path=20)
 
 # megaioind-rpi
 
