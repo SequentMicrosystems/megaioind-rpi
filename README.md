@@ -1,9 +1,9 @@
 
-[![megaioind-rpi](readmeres/sequent.jpg)](https://sequentmicrosystems.com/index.php?route=product/category&path=20)
+[![megaioind-rpi](readmeres/sequent.jpg)](https://sequentmicrosystems.com)
 
 # megaioind-rpi
 
-This is the command to control the [Industrial](https://sequentmicrosystems.com/index.php?route=product/product&path=33&product_id=52) and [Building](https://sequentmicrosystems.com/index.php?route=product/product&path=33&product_id=53) Automation I/O Expansion cards for Raspberry Pi.
+This is the command to control the old Industrialand Building Automation I/O Expansion cards for Raspberry Pi.
 
 Before compiling please install [Wiring Pi](http://wiringpi.com/download-and-install/), many thanks to Gordon Henderson for the library.
 
