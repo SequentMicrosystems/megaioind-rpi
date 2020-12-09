@@ -3,7 +3,8 @@
 
 # megaioind-rpi
 
-This is the command to control the old Industrialand Building Automation I/O Expansion cards for Raspberry Pi.
+This is the command to control the old Industrialand Building Automation I/O Expansion cards for Raspberry Pi. 
+The user manual can be found [here](https://sequentmicrosystems.com/docs/MEGA-IO-IND-UsersGuide.pdf)
 
 Before compiling please install [Wiring Pi](http://wiringpi.com/download-and-install/), many thanks to Gordon Henderson for the library.
 
