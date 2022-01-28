@@ -2,191 +2,305 @@
  * comm.c:
  *	Communication routines "platform specific" for Raspberry Pi
  *	
- *	Copyright (c) 2016-2018 Sequent Microsystem
+ *	Copyright (c) 2016-2020 Sequent Microsystem
  *	<http://www.sequentmicrosystem.com>
  ***********************************************************************
  *	Author: Alexandru Burcea
  ***********************************************************************
  */
 #include <stdio.h>
-#include <termios.h>
-#include <stdlib.h>
 #include <stdint.h>
-#include <ctype.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <wiringPi.h>
-#include <wiringPiI2C.h>
-#include <math.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+#include "comm.h"
 #include "megaioind.h"
-#include <string.h>
 
-static volatile int globalResponse = 0;
+#define I2C_SLAVE	0x0703
+#define I2C_SMBUS	0x0720	/* SMBus-level access */
+
+#define I2C_SMBUS_READ	1
+#define I2C_SMBUS_WRITE	0
+
+// SMBus transaction types
+
+#define I2C_SMBUS_QUICK		    0
+#define I2C_SMBUS_BYTE		    1
+#define I2C_SMBUS_BYTE_DATA	    2
+#define I2C_SMBUS_WORD_DATA	    3
+#define I2C_SMBUS_PROC_CALL	    4
+#define I2C_SMBUS_BLOCK_DATA	    5
+#define I2C_SMBUS_I2C_BLOCK_BROKEN  6
+#define I2C_SMBUS_BLOCK_PROC_CALL   7		/* SMBus 2.0 */
+#define I2C_SMBUS_I2C_BLOCK_DATA    8
+
+// SMBus messages
+
+#define I2C_SMBUS_BLOCK_MAX	512	/* As specified in SMBus standard */
+#define I2C_SMBUS_I2C_BLOCK_MAX	512	/* Not specified but we use same structure */
 
 
-PI_THREAD (waitForKey)
+int i2cSetup(int addr)
 {
- char resp;
- int respI = NO;
+	int file;
+	char filename[40];
+	sprintf(filename, "/dev/i2c-1");
 
- 
-	struct termios info;
-	tcgetattr(0, &info);          /* get current terminal attirbutes; 0 is the file descriptor for stdin */
-	info.c_lflag &= ~ICANON;      /* disable canonical mode */
-	info.c_cc[VMIN] = 1;          /* wait until at least one keystroke available */
-	info.c_cc[VTIME] = 0;         /* no timeout */
-	tcsetattr(0, TCSANOW, &info); /* set i */
+	if ( (file = open(filename, O_RDWR)) < 0)
+	{
+		printf("Failed to open the bus.");
+		return -1;
+	}
+	if (ioctl(file, I2C_SLAVE, addr) < 0)
+	{
+		printf("Failed to acquire bus access and/or talk to slave.\n");
+		return -1;
+	}
 
-	(void)piHiPri (10) ;	// Set this thread to be high priority
-	resp = getchar();
-	if((resp == 'y') || (resp == 'Y'))
-		respI = YES;
-	
-    piLock (COUNT_KEY) ;
-	globalResponse = respI ;
-    piUnlock (COUNT_KEY) ;
-	
-	info.c_lflag |= ICANON;      /* disable canonical mode */
-	info.c_cc[VMIN] = 0;          /* wait until at least one keystroke available */
-	info.c_cc[VTIME] = 0;         /* no timeout */
-	tcsetattr(0, TCSANOW, &info); /* set i */
-	printf("\n");
-	return &waitForKey;
+	return file;
 }
 
-void startThread(void)
+int i2cMem8Read(int dev, int add, uint8_t* buff, int size)
 {
-	wiringPiSetupSys ();
-	piThreadCreate (waitForKey);
+	uint8_t intBuff[I2C_SMBUS_BLOCK_MAX];
+
+	if (NULL == buff)
+	{
+		return -1;
+	}
+
+	if (size > I2C_SMBUS_BLOCK_MAX)
+	{
+		return -1;
+	}
+
+	intBuff[0] = 0xff & add;
+
+	if (write(dev, intBuff, 1) != 1)
+	{
+		//printf("Fail to select mem add!\n");
+		return -1;
+	}
+	if (read(dev, buff, size) != size)
+	{
+		//printf("Fail to read memory!\n");
+		return -1;
+	}
+	return 0; //OK
 }
 
-int checkThreadResult(void)
+int i2cMem8Write(int dev, int add, uint8_t* buff, int size)
 {
-	int res;
-	piLock (COUNT_KEY) ;
-	res = globalResponse;
-	piUnlock(COUNT_KEY);
-	return res;
+	uint8_t intBuff[I2C_SMBUS_BLOCK_MAX];
+
+	if (NULL == buff)
+	{
+		return -1;
+	}
+
+	if (size > I2C_SMBUS_BLOCK_MAX - 1)
+	{
+		return -1;
+	}
+
+	intBuff[0] = 0xff & add;
+	memcpy(&intBuff[1], buff, size);
+
+	if (write(dev, intBuff, size + 1) != size + 1)
+	{
+		//printf("Fail to write memory!\n");
+		return -1;
+	}
+	return 0;
 }
-	
+
+
+int readReg8(int dev, int add)
+{
+
+	int ret;
+	char buf[10];
+
+	buf[0] = 0xff & add;
+
+	if (write(dev, buf, 1) != 1)
+	{
+		printf("Fail to select mem add\n");
+		return -1;
+	}
+
+	if (read(dev, buf, 1) != 1)
+	{
+		printf("Fail to read reg\n");
+		return -1;
+	}
+	ret = 0xff & buf[0];
+	return ret;
+}
+
 int readReg16(int dev, int add)
 {
-	int val;
-	
-	val = wiringPiI2CReadReg16(dev, add);
-	
-	return val;
+	int ret = 0;
+	char buf[10];
+	char buf_o[2];
+
+	buf_o[0] = 0xff & add;
+
+	if (write(dev, buf_o, 1) != 1)
+	{
+		printf("Fail to select mem add\n");
+		return -1;
+	}
+
+	if (read(dev, buf, 1) != 1)
+	{
+		printf("Fail to read reg\n");
+		return -1;
+	}
+
+	buf_o[0] = 0xff & (add + 1);
+
+	if (write(dev, buf_o, 1) != 1)
+	{
+		printf("Fail to select mem add\n");
+		return -1;
+	}
+
+	if (read(dev, &buf[1], 1) != 1)
+	{
+		printf("Fail to read reg\n");
+		return -1;
+	}
+	memcpy(&ret, buf, 2);
+
+	return ret;
+}
+
+int readReg32(int dev, int add)
+{
+	uint32_t ret = 0;
+	char buf[10];
+
+	buf[0] = 0xff & add;
+
+	if (write(dev, buf, 1) != 1)
+	{
+		printf("Fail to select mem add\n");
+		return -1;
+	}
+
+	if (read(dev, buf, 4) != 4)
+	{
+		printf("Fail to read reg\n");
+		return -1;
+	}
+	memcpy(&ret, buf, 4);
+
+	return ret;
+}
+
+int writeReg8(int dev, int add, int val)
+{
+	char buf[10];
+
+	buf[0] = 0xff & add;
+	buf[1] = 0xff & val;
+
+	if (write(dev, buf, 2) < 0)
+	{
+		printf("Fail to w8\n");
+		return -1;
+	}
+	return OK;
+
 }
 
 int writeReg16(int dev, int add, int val)
 {
-	int ret;
- 
-	ret = wiringPiI2CWriteReg16(dev,add, val);
-	return ret;
+	char buf[10];
+
+	buf[0] = 0xff & add;
+	memcpy(&buf[1], &val, 2);
+
+	if (write(dev, buf, 3) < 0)
+	{
+		printf("Fail to w16\n");
+		return FAIL;
+	}
+	return OK;
 }
 
-
-int writeReg8(int dev, int add, int val)
+int writeReg32(int dev, int add, int val)
 {
-  int ret;
-  
-	ret = wiringPiI2CWriteReg8(dev, add, val);
-	
-	return ret;
-}
+	char buf[10];
 
-int readReg8(int dev, int add)
-{
-	return wiringPiI2CReadReg8(dev, add);
+	buf[0] = 0xff & add;
+	memcpy(&buf[1], &val, 4);
+
+	if (write(dev, buf, 5) < 0)
+	{
+		printf("Fail to w16\n");
+		return FAIL;
+	}
+	return OK;
 }
 
 
 int readReg24(int dev, int add)
 {
-	int val, aux8;
-	
-	aux8 = readReg8(dev, add + 2);
-	val = aux8;
-	/*val = 0xffff00 & (val << 8);*/
-	aux8 = readReg8(dev, add + 1);
-	val += 0xff00 & (aux8 << 8);
-	
-	aux8 = readReg8(dev, add );
-	val += 0xff0000 & (aux8 << 16);
-#ifdef DEBUG_I	
-	printbits(val);
+	int ret = 0;
+	char buf[10];
+
+	buf[0] = 0xff & add;
+
+	if (write(dev, buf, 1) != 1)
+	{
+		printf("Fail to select mem add\n");
+		return FAIL;
+	}
+
+	if (read(dev, buf, 3) != 2)
+	{
+		printf("Fail to read reg\n");
+		return FAIL;
+	}
+	memcpy(&ret, buf, 3);
+
+#ifdef DEBUG_I
+	printbits(ret);
 	printf("\n");
-	printf("%#08x\n", val);
+	printf("%#08x\n", ret);
 #endif
-	return val;
+	return ret;
 }
-
-
 
 int writeReg24(int dev, int add, int val)
 {
-	int wVal;//, aux8;
-	
-	wVal = 0xff & (val >> 8);
-	writeReg8(dev,add+1, wVal);
-	
-	wVal = 0xff & ( val >> 16);
-	writeReg8(dev,add, wVal);
-	
-	wVal = 0xff & val;
-	writeReg8(dev,add+2, wVal);
-	
-	return 0;
+	char buf[10];
+
+	buf[0] = 0xff & add;
+	memcpy(&buf[1], &val, 3);
+
+	if (write(dev, buf, 4) < 0)
+	{
+		printf("Fail to w24\n");
+		return FAIL;
+	}
+	return OK;
+
 }
 
-int readBuff(int dev, uint8_t* buff, int add, int size)
-{
-	int i, val, ret = 0;
-	
-	for(i = 0; i< size; i++)
-	{
-		val = wiringPiI2CReadReg8(dev, add + i);
-		if(val == -1)
-		{
-			return -1;
-		}
-		buff[i] = 0xff & val;
-		ret++;
-	}
-	return ret;
-}
-
-int writeBuff(int dev, uint8_t* buff, int add, int size)
-{
-	int i, val, ret = 0;
-	
-	for(i = 0; i< size; i++)
-	{
-		val = wiringPiI2CWriteReg8(dev, add + i, buff[i]);
-		if(val == -1)
-		{
-			return -1;
-		}
-		ret++;
-	}
-	return ret;
-}
-	
 int doBoardInit(int hwAdd, int* type)
 {
 	int dev, bV = -1;
-	dev = wiringPiI2CSetup (hwAdd);
+	dev = i2cSetup (hwAdd);
 	if(dev == -1)
 	{
 		return ERROR;
 	}
-	bV = wiringPiI2CReadReg8 (dev,BOARD_TYPE_MEM_ADD);
+	bV = readReg8 (dev,BOARD_TYPE_MEM_ADD);
 	if(bV == -1)
 	{
 		printf( "MegaIO Industrial id %d not detected\n", hwAdd - MEGAIO_HW_I2C_BASE_ADD);
@@ -196,11 +310,3 @@ int doBoardInit(int hwAdd, int* type)
 
 	return dev;
 }
-
-
-
-void busyWait(int ms)
-{
-	delay(ms);
-}
-	

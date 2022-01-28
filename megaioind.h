@@ -231,8 +231,8 @@ typedef struct
 		unsigned int mbStopB :2;
 	} ModbusSetingsType;	
 	
-void startThread(void);
-int checkThreadResult(void);
+//void startThread(void);
+//int checkThreadResult(void);
 int readReg16(int dev, int add);
 int readReg24(int dev, int add);
 int writeReg16(int dev, int add, int val);

@@ -18,6 +18,8 @@
 #include <sys/stat.h>
 #include <math.h>
 #include "megaioind.h"
+#include "comm.h"
+#include "thread.h"
 
 //#define VERBOSE
 
@@ -27,8 +29,8 @@
 #define V_IN_SCALE_FACTOR	(float)1000
 
 #define VERSION_BASE	(int)1
-#define VERSION_MAJOR	(int)2
-#define VERSION_MINOR	(int)1
+#define VERSION_MAJOR	(int)3
+#define VERSION_MINOR	(int)0
 
 #define RTC_MIN_DAY		1
 #define RTC_MAX_DAY		31
@@ -446,7 +448,7 @@ static void doRelayWrite(int argc, char *argv[])
 	else
 	{
 		val = atoi(argv[3]);
-		if (val < 0 || val > 255)
+		if (val < 0 || val > 15)
 		{
 			printf("Invalid relay value\n");
 			exit(1);
@@ -1514,7 +1516,7 @@ static void doTimeGet(int argc, char *argv[])
 	{
 		exit(1);
 	}
-	ret = readBuff(dev, (uint8_t*) &rtc, RTC_YEAR_ADD, sizeof(RtcStructType));
+	ret = i2cMem8Read(dev, RTC_YEAR_ADD, (uint8_t*) &rtc, sizeof(RtcStructType));
 	if (ret > 0)
 	{
 		printf("%02d/%02d/%04d %02d:%02d:%02d\n", rtc.m, rtc.d, rtc.y + 2000,
@@ -1549,7 +1551,7 @@ static void doModbusCfgGet(int argc, char* argv[])
 		exit(1);
 	}
 
-	ret = readBuff(dev, buff, MODBUS_SETINGS_ADD, 4);
+	ret = i2cMem8Read(dev, MODBUS_SETINGS_ADD, buff, 4);
 	if (ret < 1)
 	{
 		printf("Fail to read modbus settings!\n");
@@ -1609,7 +1611,7 @@ static void doModbusCfgSet(int argc, char* argv[])
 		modbus.mbStopB = 0;
 	}
 	memcpy(buff, &modbus, sizeof(buff));
-	ret = writeBuff(dev, buff, MODBUS_SETINGS_ADD, 4);
+	ret = i2cMem8Write(dev, MODBUS_SETINGS_ADD, buff, 4);
 	if (ret < 1)
 	{
 		printf("Fail!\n");
@@ -1647,7 +1649,7 @@ static void doTimeSet(int argc, char *argv[])
 	{
 		exit(1);
 	}
-	ret = writeBuff(dev, (uint8_t*) &rtc, RTC_SET_YEAR_ADD,
+	ret = i2cMem8Write(dev, RTC_SET_YEAR_ADD, (uint8_t*) &rtc,
 			sizeof(RtcStructType));
 	if (ret < 0)
 	{
@@ -1956,7 +1958,7 @@ void doBoard(int argc)
 static void doVersion(void)
 {
 	printf(
-			"MegaIO Industrial v%d.%d.%d Copyright (c) 2016 - 2019 Sequent Microsystems\n",
+			"MegaIO Industrial v%d.%d.%d Copyright (c) 2016 - 2022 Sequent Microsystems\n",
 			VERSION_BASE, VERSION_MAJOR, VERSION_MINOR);
 	printf("\nThis is free software with ABSOLUTELY NO WARRANTY.\n");
 	printf("For details type: megaioind -warranty\n");

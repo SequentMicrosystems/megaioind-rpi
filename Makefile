@@ -9,9 +9,9 @@ CC	= gcc
 CFLAGS	= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe 
 
 LDFLAGS	= -L$(DESTDIR)$(PREFIX)/lib
-LIBS    = -lwiringPi -lwiringPiDev -lpthread -lrt -lm -lcrypt
+LIBS    = -lpthread -lrt -lm -lcrypt
 
-SRC	=	megaioind.c comm.c
+SRC	=	megaioind.c comm.c thread.c
 
 OBJ	=	$(SRC:.c=.o)
 
